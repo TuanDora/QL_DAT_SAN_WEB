@@ -1,0 +1,266 @@
+﻿@model MyCourtBooking.Modules.Courts.CourtDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+    var relatedCourts = ViewBag.RelatedCourts as List<MyCourtBooking.Modules.Courts.CourtViewModel> ?? new List<MyCourtBooking.Modules.Courts.CourtViewModel>();
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb điều hướng -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-secondary">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="/Courts" class="text-decoration-none text-secondary">Danh sách sân</a></li>
+            <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- CỘT BÊN TRÁI: HÌNH ẢNH, MÔ TẢ & ĐÁNH GIÁ SÂN -->
+        <div class="col-lg-7">
+            <!-- Khối Album Hình Ảnh -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+                <img id="mainCourtImage" src="@Model.ImageUrl" class="img-fluid w-100" alt="@Model.Name" style="max-height: 420px; object-fit: cover;">
+                
+                @if (Model.CourtImages != null && Model.CourtImages.Count > 1)
+                {
+                    <div class="d-flex gap-2 p-3 overflow-auto bg-light border-top">
+                        @foreach (var img in Model.CourtImages)
+                        {
+                            <img src="@img" class="rounded-3 border court-thumb" style="width: 80px; height: 60px; object-fit: cover; cursor: pointer;" onclick="changeMainImage('@img')" alt="Thumbnail">
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Khối Mô Tả Chi Tiết & Thông Tin -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-info-circle-fill me-2 text-primary"></i>Mô Tả Chi Tiết</h5>
+                <p class="text-secondary mb-3" style="line-height: 1.7;">@Model.Description</p>
+                
+                <hr class="my-3 opacity-25">
+
+                <div class="row g-3 text-secondary small">
+                    <div class="col-md-6">
+                        <i class="bi bi-geo-alt-fill text-danger me-2"></i><strong>Địa chỉ:</strong> @Model.Address, @Model.District
+                    </div>
+                    <div class="col-md-6">
+                        <i class="bi bi-tag-fill text-primary me-2"></i><strong>Loại sân:</strong> @Model.TypeName
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khối Đánh Giá & Nhận Xét -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-star-fill text-warning me-2"></i>Đánh Giá & Nhận Xét</h5>
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill fw-bold">
+                        ★ @Model.Rating.ToString("0.0") / 5.0 (@Model.ReviewCount đánh giá)
+                    </span>
+                </div>
+
+                <!-- Form Gửi Đánh Giá -->
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <div class="bg-light p-3 rounded-3 mb-4 border">
+                        <h6 class="fw-bold mb-2">Viết đánh giá của bạn</h6>
+                        <form id="formReview" onsubmit="submitReview(event)">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" id="reviewCourtId" value="@Model.Id" />
+                            <div class="mb-2">
+                                <label class="form-label small text-muted fw-semibold mb-1">Số sao đánh giá:</label>
+                                <select id="reviewRating" class="form-select form-select-sm" style="max-width: 160px;">
+                                    <option value="5">5 Sao - Rất tốt</option>
+                                    <option value="4">4 Sao - Tốt</option>
+                                    <option value="3">3 Sao - Bình thường</option>
+                                    <option value="2">2 Sao - Tạm được</option>
+                                    <option value="1">1 Sao - Kém</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <textarea id="reviewComment" class="form-control" rows="2" placeholder="Nhập nhận xét của bạn về chất lượng sân..." required></textarea>
+                            </div>
+                            <button type="submit" id="btnSubmitReview" class="btn btn-primary btn-sm px-3 fw-bold rounded-2">
+                                Gửi đánh giá
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info py-2 small mb-4">
+                        <i class="bi bi-lock-fill me-1"></i> Vui lòng <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#authModal" class="fw-bold text-decoration-none">Đăng nhập</a> để gửi đánh giá cho sân này.
+                    </div>
+                }
+
+                <!-- Danh sách nhận xét -->
+                <div class="review-list">
+                    @if (Model.Reviews != null && Model.Reviews.Any())
+                    {
+                        foreach (var review in Model.Reviews)
+                        {
+                            <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+                                <img src="@review.UserAvatar" class="rounded-circle" width="45" height="45" style="object-fit: cover;" alt="Avatar">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="fw-bold mb-0 text-dark">@review.UserName</h6>
+                                        <small class="text-muted">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </div>
+                                    <div class="text-warning small mb-1">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star text-muted opacity-25"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <p class="text-secondary small mb-0">@review.Comment</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted small text-center my-3">Chưa có đánh giá nào cho sân này. Hãy là người đầu tiên trải nghiệm và đánh giá!</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT BÊN PHẢI: FORM CHỌN NGÀY VÀ ĐẶT SÂN TỐI ƯU -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 90px;">
+                <span class="badge bg-primary px-3 py-2 mb-2" style="width: fit-content; font-size: 13px;">@Model.TypeName</span>
+                <h3 class="fw-bold text-dark mb-2">@Model.Name</h3>
+                <p class="text-muted small mb-3"><i class="bi bi-geo-alt me-1 text-danger"></i>@Model.Address, @Model.District</p>
+                
+                <div class="d-flex align-items-baseline gap-2 mb-3">
+                    <span class="fs-3 fw-bold text-danger">@Model.BasePrice.ToString("#,##0") VNĐ</span>
+                    <span class="text-muted small">/ giờ</span>
+                </div>
+
+                <hr class="my-3 opacity-25">
+
+                <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-calendar3 me-2 text-primary"></i>Lịch Trống & Đặt Sân</h6>
+                
+                <!-- FORM CHUYỂN HƯỚNG SANG TRANG MA TRẬN 48 SLOT -->
+                <form method="get" action="/Bookings/SelectSlot">
+                    <!-- Truyền ID Sân -->
+                    <input type="hidden" name="courtId" value="@Model.Id" />
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted fw-semibold">Chọn ngày chơi:</label>
+                        <input type="date" name="date" class="form-control rounded-3 py-2 fw-bold"
+                               value="@DateTime.Now.ToString("yyyy-MM-dd")"
+                               min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    @if (Model.Status == "Available")
+                    {
+                        <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold shadow-sm rounded-3" style="background-color: #dc3545;">
+                            <i class="bi bi-calendar-check me-2"></i> Xem Lịch Trống & Đặt Sân
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-secondary btn-lg w-100 py-3 fw-bold rounded-3" disabled>
+                            Tạm Ngưng Nhận Lịch
+                        </button>
+                    }
+                </form>
+
+                <a href="/Courts" class="btn btn-outline-secondary w-100 mt-3 py-2 rounded-3 text-center text-decoration-none">
+                    &larr; Quay lại danh sách sân
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CÁC SÂN LIÊN QUAN CÙNG KHU VỰC -->
+    @if (relatedCourts.Any())
+    {
+        <div class="mt-5 pt-4 border-top">
+            <h4 class="fw-bold text-dark mb-4"><i class="bi bi-grid-fill text-primary me-2"></i>Sân Khác Tại Khu Vực @Model.District</h4>
+            <div class="row g-4">
+                @foreach (var court in relatedCourts)
+                {
+                    <div class="col-md-4">
+                        <div class="card court-card shadow-sm h-100">
+                            <img src="@court.ImageUrl" class="court-card-img" alt="@court.Name">
+                            <div class="card-body p-3">
+                                <span class="badge bg-light text-primary border mb-2">@court.TypeName</span>
+                                <h6 class="fw-bold mb-1 text-dark">@court.Name</h6>
+                                <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> @court.District</p>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="price-tag">@court.BasePrice.ToString("#,##0") đ/h</span>
+                                    <a href="/Courts/Detail/@court.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">Xem chi tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- JAVASCRIPT XỬ LÝ ẢNH & ĐÁNH GIÁ (Đã xóa toàn bộ logic Ajax khung giờ cũ) -->
+<script>
+    var currentCourtId = @Model.Id;
+
+    // Đổi ảnh thumbnail
+    function changeMainImage(src) {
+        var mainImg = document.getElementById('mainCourtImage');
+        if (mainImg) {
+            mainImg.setAttribute('src', src);
+        }
+    }
+
+    // Gửi đánh giá
+    function submitReview(e) {
+        if (e) e.preventDefault();
+        var jq = window['$'];
+        if (!jq) return;
+
+        var rating = jq('#reviewRating').val();
+        var comment = String(jq('#reviewComment').val() || '').trim();
+        var token = jq('input[name="__RequestVerificationToken"]').val();
+
+        if (!comment) {
+            alert('Vui lòng nhập nội dung nhận xét!');
+            return;
+        }
+
+        jq('#btnSubmitReview').prop('disabled', true);
+
+        jq.ajax({
+            url: '/Courts/AddReviewAjax',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { "RequestVerificationToken": token },
+            data: JSON.stringify({
+                courtId: currentCourtId,
+                rating: parseFloat(rating),
+                comment: comment
+            }),
+            success: function (res) {
+                jq('#btnSubmitReview').prop('disabled', false);
+                if (res && res.success) {
+                    alert(res.message);
+                    window.location.reload();
+                } else {
+                    alert('⚠️ ' + (res ? res.message : 'Gửi đánh giá thất bại'));
+                }
+            },
+            error: function () {
+                jq('#btnSubmitReview').prop('disabled', false);
+                alert('❌ Lỗi hệ thống khi gửi đánh giá!');
+            }
+        });
+    }
+</script>

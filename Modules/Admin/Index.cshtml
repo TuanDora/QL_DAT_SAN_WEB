@@ -1,0 +1,160 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "/Modules/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Bảng Điều Khiển";
+
+    // Chuẩn hóa & Serialize dữ liệu từ ViewBag sang JSON an toàn
+    var daysLabels = System.Text.Json.JsonSerializer.Serialize(ViewBag.DaysLabels ?? new List<string>());
+    var daysData = System.Text.Json.JsonSerializer.Serialize(ViewBag.DaysData ?? new List<decimal>());
+
+    var weeksLabels = System.Text.Json.JsonSerializer.Serialize(ViewBag.WeeksLabels ?? new List<string>());
+    var weeksData = System.Text.Json.JsonSerializer.Serialize(ViewBag.WeeksData ?? new List<decimal>());
+
+    var monthsLabels = System.Text.Json.JsonSerializer.Serialize(ViewBag.MonthsLabels ?? new List<string>());
+    var monthsData = System.Text.Json.JsonSerializer.Serialize(ViewBag.MonthsData ?? new List<decimal>());
+
+    decimal totalRevenue = ViewBag.TotalRevenue != null ? Convert.ToDecimal(ViewBag.TotalRevenue) : 0m;
+    int totalCourts = ViewBag.TotalCourts ?? 0;
+    int pendingBookings = ViewBag.PendingBookings ?? 0;
+    int totalUsers = ViewBag.TotalUsers ?? 0;
+}
+
+<!-- TIÊU ĐỀ BẢNG ĐIỀU KHIỂN -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1"><i class="bi bi-speedometer2 me-2 text-primary"></i>Bảng Điều Khiển</h3>
+        <p class="text-muted mb-0">Theo dõi trạng thái hệ thống sân thể thao realtime và doanh thu</p>
+    </div>
+</div>
+
+<!-- THẺ THỐNG KÊ NHANH (STAT CARDS) -->
+<div class="row g-3 mb-4">
+    <!-- 1. Tổng số sân -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 bg-primary text-white p-3 shadow-sm rounded-4 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-white-50 small text-uppercase fw-semibold">Tổng số sân</div>
+                    <h2 class="fw-bold my-2">@totalCourts</h2>
+                    <span class="small text-white-50"><i class="bi bi-check-circle me-1"></i>Sân hoạt động</span>
+                </div>
+                <div class="bg-white bg-opacity-20 p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-dribbble fs-2 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Tổng doanh thu -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 bg-success text-white p-3 shadow-sm rounded-4 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-white-50 small text-uppercase fw-semibold">Tổng doanh thu</div>
+                    <h2 class="fw-bold my-2">@totalRevenue.ToString("N0") đ</h2>
+                    <span class="small text-white-50"><i class="bi bi-graph-up-arrow me-1"></i>Từ đơn xác nhận</span>
+                </div>
+                <div class="bg-white bg-opacity-20 p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-cash-stack fs-2 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Đơn chờ duyệt -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 bg-warning text-dark p-3 shadow-sm rounded-4 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-dark-50 small text-uppercase fw-semibold">Đơn chờ duyệt</div>
+                    <h2 class="fw-bold my-2">@pendingBookings</h2>
+                    <span class="small text-dark-50"><i class="bi bi-exclamation-circle me-1"></i>Cần xử lý</span>
+                </div>
+                <div class="bg-dark bg-opacity-10 p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-clock-history fs-2 text-dark"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Tổng khách hàng -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 bg-info text-white p-3 shadow-sm rounded-4 h-100">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-white-50 small text-uppercase fw-semibold">Khách hàng</div>
+                    <h2 class="fw-bold my-2">@totalUsers</h2>
+                    <span class="small text-white-50"><i class="bi bi-person-check me-1"></i>Tài khoản đăng ký</span>
+                </div>
+                <div class="bg-white bg-opacity-20 p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-people fs-2 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BIỂU ĐỒ THỐNG KÊ DOANH THU ĐỘNG -->
+<div class="card border-0 shadow-sm p-4 rounded-4 bg-white">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h5 class="fw-bold mb-0 text-primary">
+            <i class="bi bi-bar-chart-line me-2"></i>Thống kê doanh thu hệ thống
+        </h5>
+
+        <!-- Bộ lọc Ngày / Tuần / Tháng -->
+        <div class="d-flex align-items-center gap-2">
+            <label for="timeFilter" class="fw-semibold text-muted small mb-0">Xem theo:</label>
+            <select id="timeFilter" class="form-select form-select-sm fw-semibold rounded-3" style="width: 160px;">
+                <option value="day" selected>7 Ngày gần nhất</option>
+                <option value="week">4 Tuần gần nhất</option>
+                <option value="month">6 Tháng gần nhất</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="position-relative" style="height: 340px;">
+        <canvas id="revenueChart"></canvas>
+    </div>
+</div>
+
+<!-- TÍCH HỢP CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // @@ts-nocheck
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Lấy phần tử Canvas vẽ biểu đồ
+        var canvas = document.getElementById("revenueChart");
+        if (canvas && canvas['getContext']) {
+            var ctx = canvas['getContext']("2d");
+
+            // Xóa 2 dòng có chứa Model.RevenueLabels và Model.RevenueData đi
+            // Thay bằng 2 dòng này:
+            var chartLabels = @Html.Raw(daysLabels);
+            var chartData = @Html.Raw(daysData);
+
+            // 3. Khởi tạo biểu đồ Chart.js qua window['Chart']
+            if (window["Chart"]) {
+                new window["Chart"](ctx, {
+                    type: "line",
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: "Doanh thu (VNĐ)",
+                            data: chartData,
+                            borderColor: "#0d6efd",
+                            backgroundColor: "rgba(13, 110, 253, 0.1)",
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true }
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>

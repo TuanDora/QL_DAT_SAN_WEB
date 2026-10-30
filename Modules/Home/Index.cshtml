@@ -1,0 +1,175 @@
+﻿@model IEnumerable<MyCourtBooking.Core.Entities.Court>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Trang Chủ - Đặt Sân Cầu Lông Hà Nội";
+    var districts = ViewBag.Districts as List<string> ?? new List<string>();
+    var totalCourts = ViewBag.TotalCourts as int? ?? (Model?.Count() ?? 0);
+}
+
+<div class="container mt-3">
+    <!-- 1. BREADCRUMB -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-3 small">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">Hà Nội</li>
+        </ol>
+    </nav>
+
+    <!-- 2. KHỐI BỘ LỌC TÌM SÂN -->
+    <div class="card border-0 shadow-sm p-3 mb-4" style="border-radius: 12px; background: #ffffff;">
+        <form action="/" method="get" id="searchCourtForm">
+            <div class="row g-2 align-items-center">
+                <!-- Nút Danh mục sân -->
+                <div class="col-lg-2 col-md-3">
+                    <a href="/Courts" class="btn btn-dark w-100 fw-bold d-flex align-items-center justify-content-center text-white text-decoration-none" style="background-color: var(--navy-primary, #0f1f3d); border: none;">
+                        <i class="bi bi-grid-fill me-2"></i> Danh mục sân
+                    </a>
+                </div>
+
+                <!-- Ô tìm tên sân -->
+                <div class="col-lg-3 col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control bg-light border-start-0" placeholder="Tên sân cầu lông...">
+                    </div>
+                </div>
+
+                <!-- Dropdown Khu vực (Quận/Huyện) -->
+                <div class="col-lg-2 col-md-5">
+                    <select name="district" class="form-select bg-light">
+                        <option value="Tất cả">Khu vực: Tất cả</option>
+                        @foreach (var dist in districts)
+                        {
+                            <option value="@dist" selected="@(dist == ViewBag.SelectedDistrict ? "selected" : null)">@dist</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Dropdown Đánh giá sao -->
+                <div class="col-lg-2 col-md-4">
+                    <select name="minRating" class="form-select bg-light">
+                        <option value="0">Đánh giá: Tất cả</option>
+                        <option value="4.5" selected="@(ViewBag.MinRating == 4.5 ? "selected" : null)">Từ 4.5 ⭐ trở lên</option>
+                        <option value="4.8" selected="@(ViewBag.MinRating == 4.8 ? "selected" : null)">Từ 4.8 ⭐ (Xuất sắc)</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown Mức giá -->
+                <div class="col-lg-2 col-md-4">
+                    <select name="maxPrice" class="form-select bg-light">
+                        <option value="0">Mức giá: Tất cả</option>
+                        <option value="85000" selected="@(ViewBag.MaxPrice == 85000 ? "selected" : null)">Dưới 85.000đ/h</option>
+                        <option value="100000" selected="@(ViewBag.MaxPrice == 100000 ? "selected" : null)">Dưới 100.000đ/h</option>
+                    </select>
+                </div>
+
+                <!-- Nút Tìm -->
+                <div class="col-lg-1 col-md-4 text-end">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold" style="background-color: var(--blue-accent, #1f5fe0);">
+                        Tìm
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 3. HAI BANNER QUẢNG CÁO / KHUYẾN MÃI -->
+    <div class="row g-3 mb-4">
+        <!-- Banner 1: Thống kê số lượng sân -->
+        <div class="col-md-6">
+            <div class="p-4 text-white d-flex align-items-center justify-content-between shadow-sm" style="background: linear-gradient(135deg, #0f1f3d 0%, #1f5fe0 100%); border-radius: 12px; min-height: 120px;">
+                <div>
+                    <span class="badge bg-danger mb-2 px-3 py-1 fw-bold text-uppercase">Hệ thống sân Hà Nội</span>
+                    <h4 class="fw-bold mb-1">Có @totalCourts sân thể thao sẵn sàng</h4>
+                    <p class="small mb-0 text-light opacity-75">Đặt sân nhanh chóng, giữ chỗ tức thì 24/7</p>
+                </div>
+                <a href="/Auth/Register" class="btn btn-light fw-bold px-3 text-primary text-nowrap rounded-pill">
+                    Đăng ký ngay
+                </a>
+            </div>
+        </div>
+
+        <!-- Banner 2: Khuyến mãi báo giá -->
+        <div class="col-md-6">
+            <div class="p-4 text-white d-flex align-items-center justify-content-between shadow-sm" style="background: linear-gradient(135deg, #e11d2e 0%, #ff6b6b 100%); border-radius: 12px; min-height: 120px;">
+                <div>
+                    <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-bold text-uppercase">Ưu đãi HOT</span>
+                    <h4 class="fw-bold mb-1">Nhập mã WELCOME10 giảm 10%</h4>
+                    <p class="small mb-0 text-light opacity-90">Áp dụng cho tất cả khách hàng mới đặt sân lần đầu</p>
+                </div>
+                <a href="#court-section" class="btn btn-outline-light fw-bold px-3 text-nowrap rounded-pill">
+                    Báo giá chi tiết
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. KHỐI "SÂN NỔI BẬT" (SỬA TIÊU ĐỀ MÀU ĐỎ & NỀN SÁNG ĐỂ NỔI BẬT CARD) -->
+    <div class="p-4 mb-4 shadow-sm border border-light" id="court-section" style="background-color: #f8f9fa; border-radius: 16px;">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <!-- SỬA TIÊU ĐỀ THÀNH MÀU ĐỎ NỔI BẬT -->
+            <h4 class="fw-bold text-danger mb-0">
+                <i class="bi bi-star-fill text-warning me-2"></i>SÂN CẦU LÔNG NỔI BẬT
+            </h4>
+            <span class="text-muted small">Hiển thị @(Model?.Count() ?? 0) sân uy tín</span>
+        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-search fs-1 mb-2"></i>
+                <p class="mb-0">Không tìm thấy sân cầu lông phù hợp với bộ lọc của bạn.</p>
+                <a href="/" class="btn btn-outline-secondary btn-sm mt-3">Xóa bộ lọc</a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var court in Model)
+                {
+                    var imgUrl = court.CourtImages?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl
+                                 ?? court.CourtImages?.FirstOrDefault()?.ImageUrl
+                                 ?? "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800";
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card court-card h-100 shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+                            <div class="position-relative">
+                                <a href="/Courts/Detail/@court.Id">
+                                    <img src="@imgUrl" class="court-card-img" alt="@court.Name" style="height: 180px; object-fit: cover; width: 100%;">
+                                </a>
+                                <span class="position-absolute top-0 start-0 m-2 badge bg-success fw-bold px-2 py-1">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Đang mở cửa
+                                </span>
+                                <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark fw-bold px-2 py-1">
+                                    ★ @court.Rating.ToString("0.0")
+                                </span>
+                            </div>
+
+                            <div class="card-body d-flex flex-column p-3">
+                                <small class="text-primary fw-bold mb-1 text-uppercase">@court.CourtType.ToString()</small>
+                                <h6 class="card-title fw-bold text-dark text-truncate mb-2" title="@court.Name">
+                                    <a href="/Courts/Detail/@court.Id" class="text-dark text-decoration-none">@court.Name</a>
+                                </h6>
+                                
+                                <p class="small text-muted mb-3 text-truncate" title="@court.Address, @court.District">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>@court.District, @court.City
+                                </p>
+
+                                <div class="mt-auto pt-2 border-top d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <small class="text-muted d-block" style="font-size: 11px;">Giá chỉ từ</small>
+                                        <span class="price-tag fw-bold text-danger fs-6">@court.BasePrice.ToString("#,##0")đ</span><small class="text-muted">/h</small>
+                                    </div>
+                                    <!-- SỬA NÚT CHI TIẾT MÀU XANH HIỂN THỊ CHỮ RÕ RÀNG -->
+                                    <a href="/Courts/Detail/@court.Id" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold text-primary">
+                                        Chi tiết <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

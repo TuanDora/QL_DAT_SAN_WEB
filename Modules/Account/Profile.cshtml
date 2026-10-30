@@ -1,0 +1,89 @@
+﻿@model MyCourtBooking.Modules.Account.UserProfileViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Thông tin cá nhân";
+}
+
+<div class="container my-4">
+    <div class="row g-4">
+        <!-- SIDEBAR TÀI KHOẢN -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 text-center rounded-4">
+                <img src="@(string.IsNullOrEmpty(Model.Avatar) ? "/images/default-avatar.png" : Model.Avatar)"
+                     class="rounded-circle mx-auto mb-2 border p-1"
+                     style="width: 100px; height: 100px; object-fit: cover;">
+                
+                <h6 class="fw-bold mb-0">@Model.FullName</h6>
+                <small class="badge bg-light text-success border my-2">@Model.RoleName</small>
+
+                <div class="list-group list-group-flush text-start small mt-2">
+                    <a href="/Account/Profile" class="list-group-item list-group-item-action active fw-semibold border-0 rounded-2 mb-1">
+                        <i class="bi bi-person me-2"></i> Hồ sơ cá nhân
+                    </a>
+                    <a href="/Bookings/MyBookings" class="list-group-item list-group-item-action fw-semibold border-0 rounded-2 mb-1">
+                        <i class="bi bi-clock-history me-2"></i> Lịch sử đặt sân
+                    </a>
+                    <a href="/Account/ChangePassword" class="list-group-item list-group-item-action fw-semibold border-0 rounded-2">
+                        <i class="bi bi-shield-lock me-2"></i> Đổi mật khẩu
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM CẬP NHẬT HỒ SƠ -->
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm p-4 rounded-4">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-person-lines-fill text-success me-2"></i>Cập nhật thông tin cá nhân
+                </h5>
+
+                <!-- Hiển thị thông báo thành công -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <!-- Hiển thị tất cả lỗi Validation nếu có -->
+                <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+
+                <form action="/Account/UpdateProfile" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <input type="hidden" name="Email" value="@Model.Email" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Họ và tên</label>
+                            <input type="text" name="FullName" value="@Model.FullName" class="form-control rounded-3" placeholder="Nhập họ và tên" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Số điện thoại</label>
+                            <input type="text" name="PhoneNumber" value="@Model.PhoneNumber" class="form-control rounded-3" placeholder="Số điện thoại" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Email (Tài khoản đăng nhập)</label>
+                            <input type="email" value="@Model.Email" class="form-control bg-light rounded-3" readonly />
+                            <small class="text-muted" style="font-size: 11px;">Email đăng nhập không thể thay đổi.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">Thay đổi Ảnh đại diện</label>
+                            <input type="file" name="AvatarFile" class="form-control rounded-3" accept="image/*" />
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <button type="submit" class="btn btn-success px-4 fw-bold rounded-pill">
+                            <i class="bi bi-save me-1"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

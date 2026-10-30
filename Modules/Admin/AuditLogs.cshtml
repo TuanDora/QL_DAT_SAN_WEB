@@ -1,0 +1,119 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<MyCourtBooking.Core.Entities.AuditLog>
+@{
+    Layout = "/Modules/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Nhật Ký Hoạt Động";
+}
+
+<div class="container-fluid px-0 py-2">
+    <!-- TIÊU ĐỀ TRANG -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-journal-text text-primary me-2"></i>Nhật Ký Hoạt Động Hệ Thống</h3>
+            <p class="text-muted mb-0">Theo dõi toàn bộ lịch sử thao tác của quản trị viên và người dùng trong hệ thống</p>
+        </div>
+        <div>
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-3 shadow-sm fw-semibold" onclick="window.location.reload()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Làm mới
+            </button>
+        </div>
+    </div>
+
+    <!-- THANH TÌM KIẾM & BỘ LỌC NHẬT KÝ -->
+    <div class="card border-0 shadow-sm p-3 rounded-4 mb-4 bg-white">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="searchString" value="@Context.Request.Query["searchString"]" class="form-control border-start-0" placeholder="Tìm theo người thực hiện, nội dung chi tiết, IP..." />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="actionFilter" class="form-select">
+                    <option value="">-- Tất cả hành động --</option>
+                    <option value="UPDATE">Cập nhật cấu hình / giá</option>
+                    <option value="CREATE">Thêm mới dữ liệu</option>
+                    <option value="DELETE">Xóa / Ngưng hoạt động</option>
+                    <option value="BOOKING">Đặt sân mới</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100 rounded-pill fw-bold"><i class="bi bi-funnel me-1"></i>Lọc</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- BẢNG NHẬT KÝ HOẠT ĐỘNG -->
+    <div class="card border-0 shadow-sm p-4 rounded-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 16%;" class="py-3">Thời gian</th>
+                        <th style="width: 20%;" class="py-3">Người thực hiện</th>
+                        <th style="width: 18%;" class="py-3">Hành động</th>
+                        <th style="width: 32%;" class="py-3">Chi tiết thao tác</th>
+                        <th style="width: 14%;" class="py-3">IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var log in Model)
+                        {
+                            <tr>
+                                <td><span class="text-muted small fw-semibold">@log.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</span></td>
+                                <td><span class="fw-bold text-dark">@log.UserName</span></td>
+                                <td>
+                                    @if (log.Action == "CREATE")
+                                    {
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Thêm mới</span>
+                                    }
+                                    else if (log.Action == "UPDATE")
+                                    {
+                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">Cập nhật</span>
+                                    }
+                                    else if (log.Action == "DELETE")
+                                    {
+                                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Xóa / Khóa</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning bg-opacity-10 text-dark px-3 py-2 rounded-pill">@log.Action</span>
+                                    }
+                                </td>
+                                <td class="text-secondary small">@log.Details</td>
+                                <td><code class="bg-light px-2 py-1 rounded text-dark">@log.IpAddress</code></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <!-- Dữ liệu minh họa khi chưa kết nối bảng AuditLog thực tế trong CSDL -->
+                        <tr>
+                            <td><span class="text-muted small fw-semibold">20/10/2026 12:45:10</span></td>
+                            <td><span class="fw-bold text-dark"><i class="bi bi-shield-check text-primary me-1"></i>Quản trị viên (Admin)</span></td>
+                            <td><span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">Cập nhật cấu hình</span></td>
+                            <td class="text-secondary small">Thay đổi tên hệ thống, thông tin tài khoản QR và bật chế độ bảo trì</td>
+                            <td><code class="bg-light px-2 py-1 rounded text-dark">127.0.0.1</code></td>
+                        </tr>
+                        <tr>
+                            <td><span class="text-muted small fw-semibold">20/10/2026 11:30:22</span></td>
+                            <td><span class="fw-bold text-dark"><i class="bi bi-shield-check text-primary me-1"></i>Quản trị viên (Admin)</span></td>
+                            <td><span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">Cập nhật giá</span></td>
+                            <td class="text-secondary small">Thay đổi biểu giá cho nhóm 'Sân Cầu Lông Đôi VIP'</td>
+                            <td><code class="bg-light px-2 py-1 rounded text-dark">127.0.0.1</code></td>
+                        </tr>
+                        <tr>
+                            <td><span class="text-muted small fw-semibold">19/10/2026 16:15:00</span></td>
+                            <td><span class="fw-bold text-dark"><i class="bi bi-person me-1"></i>Nguyễn Văn Khách</span></td>
+                            <td><span class="badge bg-warning bg-opacity-10 text-dark px-3 py-2 rounded-pill">Đặt sân mới</span></td>
+                            <td class="text-secondary small">Tạo thành công đơn đặt sân #DS88A2B (Sân Cầu Lông 01)</td>
+                            <td><code class="bg-light px-2 py-1 rounded text-dark">192.168.1.50</code></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

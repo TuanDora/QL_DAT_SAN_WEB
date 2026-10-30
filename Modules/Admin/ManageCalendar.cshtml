@@ -1,0 +1,172 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<MyCourtBooking.Core.Entities.Court>
+@using MyCourtBooking.Core.Entities
+@using MyCourtBooking.Core.Enums
+
+@{
+    Layout = "/Modules/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Lịch Đặt Sân Trực Quan";
+
+    string selectedDateStr = ViewBag.SelectedDate as string ?? DateTime.Today.ToString("yyyy-MM-dd");
+    DateTime selectedDate = DateTime.TryParse(selectedDateStr, out var parsedDate) ? parsedDate : DateTime.Today;
+    var bookings = ViewBag.Bookings as List<Booking> ?? new List<Booking>();
+    // Khung giờ hiển thị trên bảng lịch
+    var timeSlots = new List<(TimeSpan Start, TimeSpan End, string Label)>
+    {
+        (new TimeSpan(6, 0, 0), new TimeSpan(9, 0, 0), "06:00 - 09:00"),
+        (new TimeSpan(9, 0, 0), new TimeSpan(12, 0, 0), "09:00 - 12:00"),
+        (new TimeSpan(12, 0, 0), new TimeSpan(15, 0, 0), "12:00 - 15:00"),
+        (new TimeSpan(15, 0, 0), new TimeSpan(18, 0, 0), "15:00 - 18:00"),
+        (new TimeSpan(18, 0, 0), new TimeSpan(21, 0, 0), "18:00 - 21:00 (Vàng)"),
+        (new TimeSpan(21, 0, 0), new TimeSpan(24, 0, 0), "21:00 - 24:00")
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1"><i class="bi bi-calendar3 me-2 text-primary"></i>Lịch Đặt Sân Theo Ngày</h3>
+        <p class="text-muted mb-0">Theo dõi trực quan trạng thái từng sân theo từng khung giờ trong ngày</p>
+    </div>
+
+    <!-- Bộ chọn ngày xem lịch -->
+    <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-4 shadow-sm border">
+        <label for="calendarDatePicker" class="fw-semibold text-muted small mb-0 ms-2">Chọn ngày:</label>
+        <input type="date" id="calendarDatePicker" class="form-control form-control-sm border-0 fw-bold text-primary" value="@selectedDateStr" />
+    </div>
+</div>
+
+<!-- Chú thích trạng thái -->
+<div class="d-flex flex-wrap gap-4 mb-4 bg-white p-3 rounded-4 shadow-sm border">
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success p-2 rounded-circle"></span>
+        <small class="text-dark fw-semibold">Sân trống</small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-danger p-2 rounded-circle"></span>
+        <small class="text-dark fw-semibold">Đã xác nhận</small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-warning p-2 rounded-circle"></span>
+        <small class="text-dark fw-semibold">Chờ duyệt</small>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-secondary p-2 rounded-circle"></span>
+        <small class="text-dark fw-semibold">Bảo trì / Khóa</small>
+    </div>
+</div>
+
+<!-- Lưới lịch đặt sân (Grid View) -->
+<div class="card border-0 shadow-sm p-4 rounded-4 bg-white">
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 18%;" class="text-start">Tên sân / Loại</th>
+                    @foreach (var slot in timeSlots)
+                    {
+                        <th>@slot.Label</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var court in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-start">
+                                <div class="text-dark">@court.Name</div>
+                                <small class="text-muted fw-normal">@(court.CourtType.ToString() ?? "Cầu lông") - @court.District</small>
+                            </td>
+
+                            @if (!court.IsActive)
+                            {
+                                <td colspan="@timeSlots.Count">
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary w-100 py-2 fw-semibold">Sân đang bảo trì</span>
+                                </td>
+                            }
+                            else
+                            {
+                                foreach (var slot in timeSlots)
+                                {
+                                    // Tìm đơn đặt trùng sân và trùng khoảng thời gian khung giờ
+                                    var matchedBooking = bookings.FirstOrDefault(b => b.BookingDetails != null && b.BookingDetails.Any(bd =>
+                                        bd.CourtId == court.Id &&
+                                        bd.PlayDate.Date == selectedDate.Date &&
+                                        bd.StartTime < slot.End && bd.EndTime > slot.Start));
+
+                                    if (matchedBooking != null)
+                                    {
+                                        var customerName = !string.IsNullOrWhiteSpace(matchedBooking.CustomerName)
+                                            ? matchedBooking.CustomerName
+                                            : (matchedBooking.User?.FullName ?? "Khách đặt");
+
+                                        if (matchedBooking.Status == BookingStatus.Confirmed)
+                                        {
+                                            <td>
+                                                <span class="badge bg-danger bg-opacity-10 text-danger w-100 py-2 fw-semibold" title="Mã đơn: #@matchedBooking.BookingCode">
+                                                    <i class="bi bi-person-fill me-1"></i>@customerName
+                                                </span>
+                                            </td>
+                                        }
+                                        else if (matchedBooking.Status == BookingStatus.Pending)
+                                        {
+                                            <td>
+                                                <span class="badge bg-warning bg-opacity-10 text-warning w-100 py-2 fw-semibold" title="Đang chờ admin duyệt">
+                                                    <i class="bi bi-hourglass-split me-1"></i>Chờ duyệt (@customerName)
+                                                </span>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <span class="badge bg-success bg-opacity-10 text-success w-100 py-2 fw-semibold">
+                                                    <i class="bi bi-check-circle me-1"></i>Trống
+                                                </span>
+                                            </td>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                            <span class="badge bg-success bg-opacity-10 text-success w-100 py-2 fw-semibold">
+                                                <i class="bi bi-check-circle me-1"></i>Trống
+                                            </span>
+                                        </td>
+                                    }
+                                }
+                            }
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Chưa có dữ liệu sân thể thao.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    
+    function changeCalendarDate(dateVal) {
+        if (!dateVal) return;
+        // Chuyển hướng trang theo ngày được chọn (sửa lại đường dẫn URL nếu cần)
+        window.location.href = '/Bookings/ManageCalendar?date=' + dateVal;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var datePicker = document.getElementById("calendarDatePicker");
+        if (datePicker) {
+            datePicker.addEventListener("change", function (e) {
+                var target = e.target;
+                if (target && target["value"]) {
+                    changeCalendarDate(target["value"]);
+                }
+            });
+        }
+    });
+</script>

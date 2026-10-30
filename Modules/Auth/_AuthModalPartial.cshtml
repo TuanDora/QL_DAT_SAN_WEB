@@ -1,0 +1,327 @@
+﻿@Html.AntiForgeryToken()
+
+<!-- MODAL POPUP CHUẨN GIAO DIỆN -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; padding: 20px; background: #ffffff;">
+            
+            <!-- NÚT X ĐÓNG POPUP -->
+            <div class="d-flex justify-content-end mb-1">
+                <button type="button" class="btn-close rounded-circle p-2 bg-light" data-bs-dismiss="modal" aria-label="Close" style="font-size: 12px;"></button>
+            </div>
+
+            <!-- MODAL BODY -->
+            <div class="modal-body p-2 pt-0">
+                
+                <!-- THÔNG BÁO CHUNG -->
+                <div id="authAlert" class="alert d-none py-2 small fw-semibold text-center mb-3" role="alert"></div>
+
+                <!-- 1. FORM ĐĂNG NHẬP -->
+                <div id="loginPane">
+                    <div class="text-start mb-4">
+                        <p class="text-secondary mb-1" style="font-size: 16px; font-weight: 500;">Xin chào bạn</p>
+                        <h3 class="fw-bold text-dark" style="color: #0f1f3d !important; font-size: 28px; letter-spacing: -0.5px;">Đăng nhập để tiếp tục</h3>
+                    </div>
+
+                    <form id="formLogin" onsubmit="submitLogin(event)">
+                        <div class="mb-3">
+                            <div class="input-group" style="border-radius: 12px; overflow: hidden; border: 1px solid #dee2e6;">
+                                <span class="input-group-text bg-white border-0 text-muted px-3"><i class="bi bi-person fs-5"></i></span>
+                                <input type="text" id="loginEmailOrPhone" class="form-control border-0 py-2" placeholder="Email hoặc số điện thoại" style="box-shadow: none; font-size: 15px;" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="input-group" style="border-radius: 12px; overflow: hidden; border: 1px solid #dee2e6;">
+                                <span class="input-group-text bg-white border-0 text-muted px-3"><i class="bi bi-lock fs-5"></i></span>
+                                <input type="password" id="loginPassword" class="form-control border-0 py-2" placeholder="Mật khẩu" style="box-shadow: none; font-size: 15px;" required>
+                                <button class="btn btn-white border-0 text-muted px-3" type="button" onclick="togglePasswordVisibility('loginPassword', 'loginIcon')">
+                                    <i id="loginIcon" class="bi bi-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnLoginSubmit" class="btn btn-outline-dark w-100 py-2 fw-bold my-2" style="border-radius: 12px; font-size: 16px; border-width: 1.5px;">
+                            <span id="loginSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
+                            Đăng nhập
+                        </button>
+                    </form>
+
+                    <div class="text-start mt-2 mb-3">
+                        <a href="javascript:void(0)" onclick="showForgotPassword()" class="text-decoration-none text-dark fw-semibold" style="font-size: 15px;">Quên mật khẩu ?</a>
+                    </div>
+
+                    <div class="text-center my-4 position-relative">
+                        <hr class="text-muted" style="opacity: 0.15;">
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-secondary" style="font-size: 15px;">Hoặc tài khoản</span>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <a href="/Auth/GoogleLogin" class="btn btn-light w-100 d-flex align-items-center justify-content-center py-2 px-2 border text-decoration-none" style="border-radius: 12px; font-size: 14px; font-weight: 600; background-color: #fafafa; color: #333;">
+                                <svg class="me-2" width="20" height="20" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                                </svg>
+                                Đăng nhập Google
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="/Auth/ZaloLogin" class="btn btn-light w-100 d-flex align-items-center justify-content-center py-2 px-2 border text-decoration-none" style="border-radius: 12px; font-size: 14px; font-weight: 600; background-color: #fafafa; color: #333;">
+                                <i class="bi bi-chat-fill text-primary me-2 fs-5"></i>
+                                Đăng nhập Zalo
+                            </a>
+                        </div>
+                    </div>
+
+                    <p class="text-center text-secondary mb-4" style="font-size: 14px; line-height: 1.5;">
+                        Bằng cách đăng nhập, bạn đồng ý với <a href="#" class="text-danger text-decoration-none">Điều khoản dịch vụ</a> , <br>
+                        <a href="#" class="text-danger text-decoration-none">Chính sách bảo mật</a> của chúng tôi.
+                    </p>
+
+                    <p class="text-center text-dark mb-0" style="font-size: 15px; font-weight: 500;">
+                        Chưa là thành viên? <a href="javascript:void(0)" onclick="showRegisterPane()" class="text-danger fw-bold text-decoration-none">Đăng ký</a> tại đây
+                    </p>
+                </div>
+
+                <!-- 2. FORM ĐĂNG KÝ -->
+                <div id="registerPane" class="d-none">
+                    <div class="text-start mb-3">
+                        <h4 class="fw-bold text-dark mb-1">Tạo tài khoản mới</h4>
+                        <p class="text-muted small mb-0">Đăng ký để trải nghiệm đặt sân cầu lông tiện lợi</p>
+                    </div>
+
+                    <form id="formRegister" onsubmit="submitRegister(event)">
+                        <div class="mb-2">
+                            <label class="form-label text-dark small fw-semibold mb-1">Họ và tên *</label>
+                            <input type="text" id="regFullName" class="form-control" placeholder="Nhập họ và tên" required>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label text-dark small fw-semibold mb-1">Email *</label>
+                            <input type="email" id="regEmail" class="form-control" placeholder="name@example.com" required>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label text-dark small fw-semibold mb-1">Số điện thoại *</label>
+                            <input type="tel" id="regPhone" class="form-control" placeholder="0912345678" required>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label text-dark small fw-semibold mb-1">Mật khẩu *</label>
+                            <div class="input-group">
+                                <input type="password" id="regPassword" class="form-control" placeholder="Tối thiểu 6 ký tự" required minlength="6">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('regPassword', 'regPasswordIcon')">
+                                    <i id="regPasswordIcon" class="bi bi-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-dark small fw-semibold mb-1">Xác nhận mật khẩu *</label>
+                            <input type="password" id="regConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" required minlength="6">
+                        </div>
+
+                        <button type="submit" id="btnRegisterSubmit" class="btn btn-danger w-100 py-2.5 fw-bold text-uppercase mt-2" style="border-radius: 12px; background-color: #dc3545;">
+                            <span id="regSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
+                            Tạo tài khoản
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <a href="javascript:void(0)" onclick="showLoginPane()" class="text-decoration-none text-secondary small fw-semibold">
+                                ← Đã có tài khoản? Đăng nhập
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 3. FORM QUÊN MẬT KHẨU -->
+                <div id="forgotPasswordPane" class="d-none">
+                    <h5 class="fw-bold text-dark mb-2">Quên mật khẩu?</h5>
+                    <p class="text-muted small mb-3">Nhập địa chỉ Email của bạn để nhận liên kết khôi phục mật khẩu.</p>
+                    
+                    <form onsubmit="submitForgotPassword(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Email đăng ký</label>
+                            <input type="email" id="forgotEmail" class="form-control" placeholder="name@example.com" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mb-2" style="border-radius: 10px;">Gửi liên kết khôi phục</button>
+                        <button type="button" onclick="showLoginPane()" class="btn btn-link text-secondary w-100 text-decoration-none small">Quay lại đăng nhập</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    declare var $: any;
+    declare var bootstrap: any;
+    function togglePasswordVisibility(inputId, iconId) {
+        var input = document.getElementById(inputId);
+        var icon = document.getElementById(iconId);
+        if (input && icon) {
+            if (input.getAttribute('type') === 'password') {
+                input.setAttribute('type', 'text');
+                icon.className = 'bi bi-eye';
+            } else {
+                input.setAttribute('type', 'password');
+                icon.className = 'bi bi-eye-slash';
+            }
+        }
+    }
+
+    function showRegisterPane() {
+        $('#loginPane, #forgotPasswordPane').addClass('d-none');
+        $('#registerPane').removeClass('d-none');
+        hideAuthAlert();
+    }
+
+    function showLoginPane() {
+        $('#registerPane, #forgotPasswordPane').addClass('d-none');
+        $('#loginPane').removeClass('d-none');
+        hideAuthAlert();
+    }
+
+    function showForgotPassword() {
+        $('#loginPane, #registerPane').addClass('d-none');
+        $('#forgotPasswordPane').removeClass('d-none');
+        hideAuthAlert();
+    }
+
+    function showAuthAlert(msg, type) {
+        var alertType = type || 'danger';
+        var $alertBox = $('#authAlert');
+        $alertBox.attr('class', 'alert alert-' + alertType + ' py-2 small fw-semibold text-center mb-3');
+        $alertBox.html(msg);
+        $alertBox.removeClass('d-none');
+    }
+
+    function hideAuthAlert() {
+        $('#authAlert').addClass('d-none');
+    }
+
+    function submitLogin(e) {
+        if (e) e.preventDefault();
+        hideAuthAlert();
+
+        var emailOrPhone = $('#loginEmailOrPhone').val().trim();
+        var password = $('#loginPassword').val().trim();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        if (!emailOrPhone || !password) {
+            showAuthAlert('Vui lòng nhập Email/SĐT và Mật khẩu!', 'danger');
+            return;
+        }
+
+        $('#btnLoginSubmit').prop('disabled', true);
+        $('#loginSpinner').removeClass('d-none');
+
+        $.ajax({
+            url: '/Auth/LoginAjax',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { "RequestVerificationToken": token },
+            data: JSON.stringify({
+                emailOrPhone: emailOrPhone,
+                password: password,
+                rememberMe: true
+            }),
+            success: function (res) {
+                $('#btnLoginSubmit').prop('disabled', false);
+                $('#loginSpinner').addClass('d-none');
+
+                if (res.success) {
+                    showAuthAlert('✅ ' + res.message, 'success');
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 800);
+                } else {
+                    showAuthAlert('❌ ' + res.message, 'danger');
+                }
+            },
+            error: function () {
+                $('#btnLoginSubmit').prop('disabled', false);
+                $('#loginSpinner').addClass('d-none');
+                showAuthAlert('❌ Lỗi hệ thống khi đăng nhập!', 'danger');
+            }
+        });
+    }
+
+    function submitRegister(e) {
+        if (e) e.preventDefault();
+        hideAuthAlert();
+
+        var fullName = $('#regFullName').val().trim();
+        var email = $('#regEmail').val().trim();
+        var phone = $('#regPhone').val().trim();
+        var password = $('#regPassword').val().trim();
+        var confirmPassword = $('#regConfirmPassword').val().trim();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        if (password !== confirmPassword) {
+            showAuthAlert('❌ Mật khẩu xác nhận không khớp!', 'danger');
+            return;
+        }
+
+        $('#btnRegisterSubmit').prop('disabled', true);
+        $('#regSpinner').removeClass('d-none');
+
+        $.ajax({
+            url: '/Auth/RegisterAjax',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { "RequestVerificationToken": token },
+            data: JSON.stringify({
+                fullName: fullName,
+                email: email,
+                phoneNumber: phone,
+                password: password,
+                confirmPassword: confirmPassword
+            }),
+            success: function (res) {
+                $('#btnRegisterSubmit').prop('disabled', false);
+                $('#regSpinner').addClass('d-none');
+
+                if (res.success) {
+                    showAuthAlert('🎉 ' + res.message, 'success');
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAuthAlert('⚠️ ' + res.message, 'danger');
+                }
+            },
+            error: function () {
+                $('#btnRegisterSubmit').prop('disabled', false);
+                $('#regSpinner').addClass('d-none');
+                showAuthAlert('❌ Lỗi hệ thống khi đăng ký!', 'danger');
+            }
+        });
+    }
+
+    function submitForgotPassword(e) {
+        if (e) e.preventDefault();
+        hideAuthAlert();
+        var email = $('#forgotEmail').val().trim();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: '/Auth/ForgotPasswordAjax',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { "RequestVerificationToken": token },
+            data: JSON.stringify({ email: email }),
+            success: function (res) {
+                showAuthAlert(res.message, res.success ? 'info' : 'danger');
+            },
+            error: function () {
+                showAuthAlert('❌ Lỗi hệ thống khi gửi yêu cầu!', 'danger');
+            }
+        });
+    }
+</script>

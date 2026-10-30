@@ -1,0 +1,294 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<MyCourtBooking.Core.Entities.Court>
+@{
+    Layout = "/Modules/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý Sân";
+    var courtTypes = ViewBag.CourtTypes as List<MyCourtBooking.Core.Enums.CourtType> ?? new List<MyCourtBooking.Core.Enums.CourtType>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">        
+    <div>
+        <h3 class="fw-bold mb-1"><i class="bi bi-dribbble me-2 text-primary"></i>Danh Sách Sân Thể Thao</h3>
+        <p class="text-muted mb-0">Quản lý cơ sở vật chất, biểu giá và trạng thái hoạt động thực tế</p>
+    </div>
+    <button class="btn btn-primary rounded-pill px-3 shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addCourtModal">
+        <i class="bi bi-plus-lg me-1"></i>Thêm Sân Mới
+    </button>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Thanh lọc & Tìm kiếm -->
+<div class="card border-0 shadow-sm p-3 rounded-4 mb-4 bg-white">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control border-start-0" placeholder="Tìm theo tên sân, quận/huyện, loại sân..." />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="statusFilter" class="form-select">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Available" selected="@(ViewData["StatusFilter"]?.ToString() == "Available")">Sẵn sàng (Hoạt động)</option>
+                <option value="Maintenance" selected="@(ViewData["StatusFilter"]?.ToString() == "Maintenance")">Tạm ngưng / Bảo trì</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-dark w-100 rounded-pill fw-bold"><i class="bi bi-funnel me-1"></i>Lọc</button>
+        </div>
+    </form>
+</div>
+
+<!-- Bảng hiển thị Sân -->
+<div class="card border-0 shadow-sm p-4 rounded-4 bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 8%;">ID</th>
+                    <th style="width: 25%;">Tên Sân</th>
+                    <th style="width: 15%;">Loại Sân</th>
+                    <th style="width: 22%;">Địa Chỉ / Khu Vực</th>
+                    <th style="width: 15%;">Giá Theo Giờ</th>
+                    <th style="width: 15%;">Trạng Thái</th>
+                    <th class="text-end" style="width: 10%;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var court in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-muted">#@court.Id</td>
+                            <td class="fw-bold text-dark">@court.Name</td>
+                            <td><span class="badge bg-secondary bg-opacity-10 text-dark border px-3 py-2 rounded-pill">@(court.CourtType.ToString() ?? "Cầu lông")</span></td>
+                            <td class="small text-muted">@court.Address, @court.District</td>
+                            <td class="fw-bold text-danger">@court.BasePrice.ToString("#,##0") đ/h</td>
+                            <td>
+                                @if (court.IsActive)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">Sẵn sàng</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill">Bảo trì / Ngưng</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <!-- Nút Sửa mở Modal sử dụng data-* attributes -->
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary rounded-circle me-1 edit-court-btn"
+                                        title="Sửa thông tin"
+                                        data-id="@court.Id"
+                                        data-name="@court.Name"
+                                        data-courttypeid="@court.CourtTypeId"
+                                        data-district="@court.District"
+                                        data-address="@court.Address"
+                                        data-baseprice="@court.BasePrice"
+                                        data-description="@court.Description"
+                                        data-isactive="@(court.IsActive ? "true" : "false")">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <!-- Form Xóa/Khóa sân -->
+                                <form asp-controller="Admin" asp-action="DeleteCourt" asp-route-id="@court.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn ngưng hoạt động sân này?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Tạm ngưng sân">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Chưa có sân nào trong hệ thống. Bấm "Thêm Sân Mới" để tạo!</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm Sân -->
+<div class="modal fade" id="addCourtModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Thêm Sân Mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-controller="Admin" asp-action="CreateCourt" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tên sân <span class="text-danger">*</span></label>
+                            <input type="text" name="Name" class="form-control" placeholder="Ví dụ: Sân Cầu Lông 04" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Loại sân <span class="text-danger">*</span></label>
+                            <select name="CourtTypeId" class="form-select" required>
+                                @foreach (var type in courtTypes)
+                                {
+                                    <option value="@((int)type)">@type.ToString()</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Quận / Huyện <span class="text-danger">*</span></label>
+                            <input type="text" name="District" class="form-control" placeholder="Ví dụ: Cầu Giấy" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Địa chỉ chi tiết <span class="text-danger">*</span></label>
+                            <input type="text" name="Address" class="form-control" placeholder="Ví dụ: 123 Đường Cầu Giấy" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Giá thuê theo giờ (VNĐ) <span class="text-danger">*</span></label>
+                            <input type="number" name="BasePrice" class="form-control" value="120000" step="1000" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Trạng thái ban đầu</label>
+                            <select name="IsActive" class="form-select">
+                                <option value="true">Sẵn sàng (Hoạt động)</option>
+                                <option value="false">Tạm ngưng / Bảo trì</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Mô tả chi tiết sân</label>
+                            <textarea name="Description" class="form-control" rows="3" placeholder="Nhập thông tin mô tả cơ sở vật chất..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Tạo sân mới</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Sửa Sân -->
+<div class="modal fade" id="editCourtModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Cập Nhật Thông Tin Sân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-controller="Admin" asp-action="EditCourt" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input type="hidden" id="editCourtId" name="Id" />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tên sân <span class="text-danger">*</span></label>
+                            <input type="text" id="editCourtName" name="Name" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Loại sân <span class="text-danger">*</span></label>
+                            <select id="editCourtTypeId" name="CourtTypeId" class="form-select" required>
+                                @foreach (var type in courtTypes)
+                                {
+                                    <option value="@((int)type)">@type.ToString()</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Quận / Huyện <span class="text-danger">*</span></label>
+                            <input type="text" id="editCourtDistrict" name="District" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Địa chỉ chi tiết <span class="text-danger">*</span></label>
+                            <input type="text" id="editCourtAddress" name="Address" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Giá thuê theo giờ (VNĐ) <span class="text-danger">*</span></label>
+                            <input type="number" id="editCourtBasePrice" name="BasePrice" class="form-control" step="1000" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Trạng thái</label>
+                            <select id="editCourtIsActive" name="IsActive" class="form-select">
+                                <option value="true">Sẵn sàng (Hoạt động)</option>
+                                <option value="false">Tạm ngưng / Bảo trì</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Mô tả chi tiết sân</label>
+                            <textarea id="editCourtDescription" name="Description" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Lưu cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Sửa lỗi TS2683: Thay 'this' bằng 'e.currentTarget' hoặc tham số phần tử truyền vào
+    document.querySelectorAll('.btn-edit-court').forEach(function (button) {
+        button.addEventListener('click', function (e) {
+            var btn = e.currentTarget;
+            if (!btn || !(btn instanceof HTMLElement)) return;
+
+            var id = btn.getAttribute('data-id') || '';
+            var name = btn.getAttribute('data-name') || '';
+            var typeId = btn.getAttribute('data-type-id') || '';
+            var price = btn.getAttribute('data-price') || '';
+            var address = btn.getAttribute('data-address') || '';
+            var district = btn.getAttribute('data-district') || '';
+            var desc = btn.getAttribute('data-description') || '';
+
+            openEditCourtModal(id, name, typeId, price, address, district, desc);
+        });
+    });
+
+    // 2. Sửa lỗi TS2531 & TS2339 & TS2304
+    function openEditCourtModal(id, name, typeId, price, address, district, desc) {
+        // Hàm hỗ trợ gán giá trị an toàn cho HTMLElement
+        function setInputValue(elementId, val) {
+            var el = document.getElementById(elementId);
+            if (el) {
+                el['value'] = val;
+            }
+        }
+
+        setInputValue('editCourtId', id);
+        setInputValue('editCourtName', name);
+        setInputValue('editTypeId', typeId);
+        setInputValue('editBasePrice', price);
+        setInputValue('editAddress', address);
+        setInputValue('editDistrict', district);
+        setInputValue('editDescription', desc);
+
+        // Mở Modal Bootstrap an toàn qua window['bootstrap']
+        var modalEl = document.getElementById('editCourtModal');
+        if (modalEl && window['bootstrap']) {
+            var modal = new (window['bootstrap']).Modal(modalEl);
+            modal.show();
+        }
+    }
+</script>

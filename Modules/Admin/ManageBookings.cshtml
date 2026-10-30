@@ -1,0 +1,164 @@
+﻿@using MyCourtBooking.Core.Entities
+@using MyCourtBooking.Core.Enums
+@model IEnumerable<MyCourtBooking.Core.Entities.Booking>
+@{
+    Layout = "/Modules/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý Đặt Sân";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1"><i class="bi bi-calendar-check me-2 text-primary"></i>Quản Lý Đặt Sân</h3>
+        <p class="text-muted mb-0">Theo dõi, duyệt và quản lý trạng thái các đơn đặt sân trong hệ thống</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Thanh Tìm kiếm & Lọc đơn hàng -->
+<div class="card border-0 shadow-sm p-3 rounded-4 mb-4 bg-white">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control border-start-0" placeholder="Tìm theo tên khách, số điện thoại, mã đơn..." />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="statusFilter" class="form-select">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Pending" selected="@(ViewData["StatusFilter"]?.ToString() == "Pending")">Chờ duyệt</option>
+                <option value="Confirmed" selected="@(ViewData["StatusFilter"]?.ToString() == "Confirmed")">Đã xác nhận</option>
+                <option value="Cancelled" selected="@(ViewData["StatusFilter"]?.ToString() == "Cancelled")">Đã hủy</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-dark w-100 rounded-pill fw-bold"><i class="bi bi-funnel me-1"></i>Lọc</button>
+        </div>
+    </form>
+</div>
+
+<!-- Bảng Danh Sách Đặt Sân -->
+<div class="card border-0 shadow-sm p-4 rounded-4 bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 12%;">Mã Đơn</th>
+                    <th style="width: 20%;">Khách Hàng</th>
+                    <th style="width: 16%;">Sân</th>
+                    <th style="width: 12%;">Ngày Chơi</th>
+                    <th style="width: 15%;">Khung Giờ</th>
+                    <th style="width: 12%;">Tổng Tiền</th>
+                    <th style="width: 13%;">Trạng Thái</th>
+                    <th class="text-end" style="width: 10%;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        var firstDetail = item.BookingDetails?.FirstOrDefault();
+                        var courtName = firstDetail?.Court?.Name ?? "Chưa xếp sân";
+                        var playDate = firstDetail?.PlayDate ?? item.BookingDate;
+                        var startTime = firstDetail != null ? firstDetail.StartTime.ToString(@"hh\:mm") : "--:--";
+                        var endTime = firstDetail != null ? firstDetail.EndTime.ToString(@"hh\:mm") : "--:--";
+                        var totalAmount = item.FinalAmount > 0 ? item.FinalAmount : item.TotalAmount;
+                        var customerName = !string.IsNullOrWhiteSpace(item.CustomerName) ? item.CustomerName : (item.User?.FullName ?? "Khách vãng lai");
+                        var customerPhone = !string.IsNullOrWhiteSpace(item.CustomerPhone) ? item.CustomerPhone : (item.User?.PhoneNumber ?? "---");
+
+                        <tr>
+                            <td class="fw-bold text-primary">#@(item.BookingCode ?? item.Id.ToString())</td>
+                            <td>
+                                <div class="fw-bold text-dark">@customerName</div>
+                                <small class="text-muted"><i class="bi bi-telephone me-1"></i>@customerPhone</small>
+                            </td>
+                            <td class="fw-bold text-secondary">@courtName</td>
+                            <td>@playDate.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="badge bg-light text-dark border px-2 py-1">
+                                    <i class="bi bi-clock me-1"></i>@startTime - @endTime
+                                </span>
+                            </td>
+                            <td class="fw-bold text-danger">@totalAmount.ToString("#,##0") đ</td>
+                            <td>
+                                @if (item.Status == BookingStatus.Confirmed)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">Đã xác nhận</span>
+                                }
+                                else if (item.Status == BookingStatus.Cancelled)
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill">Đã hủy</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-3 py-2 rounded-pill">Chờ duyệt</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-1">
+                                    @if (item.Status == BookingStatus.Pending)
+                                    {
+                                        <form asp-controller="Admin" asp-action="UpdateBookingStatus" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="bookingId" value="@item.Id" />
+                                            <input type="hidden" name="status" value="Confirmed" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success rounded-circle" title="Duyệt đơn">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+
+                                        <form asp-controller="Admin" asp-action="UpdateBookingStatus" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đặt sân này?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="bookingId" value="@item.Id" />
+                                            <input type="hidden" name="status" value="Cancelled" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Hủy đơn">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else if (item.Status == BookingStatus.Confirmed)
+                                    {
+                                        <form asp-controller="Admin" asp-action="UpdateBookingStatus" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đã xác nhận này?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="bookingId" value="@item.Id" />
+                                            <input type="hidden" name="status" value="Cancelled" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Hủy đơn">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">--</span>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">Chưa có đơn đặt sân nào phù hợp trong hệ thống.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

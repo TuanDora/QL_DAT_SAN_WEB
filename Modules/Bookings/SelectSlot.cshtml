@@ -1,0 +1,913 @@
+﻿@model List<MyCourtBooking.Modules.Bookings.SlotViewModel>
+
+@{
+    ViewData["Title"] = "Đặt sân và Chọn Khung Giờ";
+
+    var selectedDate = ViewBag.SelectedDate as string
+        ?? DateTime.Today.ToString("yyyy-MM-dd");
+
+    var courts = Model
+        .GroupBy(s => s.CourtId)
+        .OrderBy(g => g.Key)
+        .ToList();
+
+    string courtPhone = ViewBag.CourtPhone as string ?? "";
+    string courtZalo = ViewBag.CourtZalo as string ?? "";
+
+    string phoneDigits = System.Text.RegularExpressions.Regex.Replace(courtPhone, @"\D", "");
+    string zaloDigits = System.Text.RegularExpressions.Regex.Replace(courtZalo, @"\D", "");
+}
+
+@Html.AntiForgeryToken()
+
+<style>
+    .booking-page {
+        max-width: 1450px;
+        margin: 0 auto;
+        padding: 20px;
+        padding-bottom: 35px;
+        color: #243044;
+    }
+
+    .header, .court-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .header {
+        margin-bottom: 18px;
+    }
+
+    .subtitle, .muted {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .panel, .court-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .date-panel, .legend, .actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+        .date-panel input {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+        }
+
+    .price-list {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 14px;
+        padding: 12px 14px;
+        margin: 15px 0;
+        border-radius: 10px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        font-size: 13px;
+    }
+
+    .legend {
+        margin: 14px 0;
+        font-size: 13px;
+    }
+
+        .legend span {
+            display: inline-block;
+            width: 13px;
+            height: 13px;
+            border-radius: 3px;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+    .lg-empty {
+        background: #e4f7e9;
+    }
+
+    .lg-selected {
+        background: #16a34a;
+    }
+
+    .lg-booked {
+        background: #fee2e2;
+    }
+
+    .lg-locked {
+        background: #e5e7eb;
+    }
+
+    .court-heading {
+        margin-bottom: 12px;
+    }
+
+        .court-heading h5 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+    .slot-grid {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .slot {
+        min-width: 0;
+        min-height: 43px;
+        border: 1px solid #b7e4c2;
+        border-radius: 7px;
+        padding: 5px 1px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        line-height: 1.2;
+        background: #e4f7e9;
+        color: #166534;
+        cursor: pointer;
+    }
+
+    .slot-time {
+        font-weight: 750;
+        font-size: 12px;
+    }
+
+    .slot.empty:hover {
+        background: #c9f2d3;
+    }
+
+    .slot.selected {
+        background: #16a34a;
+        border-color: #15803d;
+        color: white;
+    }
+
+    .slot.booked {
+        background: #fee2e2;
+        color: #b91c1c;
+        border-color: #fecaca;
+        cursor: not-allowed;
+    }
+
+    .slot.locked {
+        background: #e5e7eb;
+        color: #6b7280;
+        border-color: #d1d5db;
+        cursor: not-allowed;
+    }
+
+    .slot:disabled {
+        opacity: 1;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin: 12px 0;
+    }
+
+    .summary-item {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 10px;
+        min-width: 0;
+    }
+
+    .summary-label {
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .summary-value {
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .btn-booking {
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: 650;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-green {
+        background: #16a34a;
+        color: white;
+    }
+
+    .btn-gray {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .btn-booking:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    .notice {
+        display: none;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+    }
+
+        .notice.show {
+            display: block;
+        }
+
+        .notice.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .notice.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+    .floating-summary {
+        display: none;
+        position: fixed;
+        right: 22px;
+        bottom: 20px;
+        z-index: 900;
+        width: 350px;
+        max-width: calc(100vw - 24px);
+        max-height: 75vh;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 15px;
+        padding: 17px;
+        box-shadow: 0 8px 35px rgba(0, 0, 0, .22);
+    }
+
+        .floating-summary.show {
+            display: block;
+        }
+
+    .floating-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+        .floating-heading h5 {
+            margin: 0;
+            font-weight: 750;
+        }
+
+    .floating-close {
+        border: 0;
+        background: #f3f4f6;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        font-size: 19px;
+    }
+
+    .floating-total {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        padding: 12px;
+        border-radius: 10px;
+        margin: 12px 0;
+    }
+
+        .floating-total strong {
+            display: block;
+            color: #15803d;
+            font-size: 23px;
+            margin-top: 3px;
+        }
+
+    .floating-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+        .floating-actions button {
+            flex: 1;
+        }
+
+    .modal-backdrop-custom {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1100;
+        background: rgba(15, 23, 42, .60);
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+
+        .modal-backdrop-custom.show {
+            display: flex;
+        }
+
+    .confirm-modal {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        width: 100%;
+        max-width: 650px;
+        max-height: 92vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
+    }
+
+        .confirm-modal h3 {
+            margin: 0 0 6px;
+            font-size: 25px;
+            color: #166534;
+        }
+
+    .confirm-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .confirm-section {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 14px;
+    }
+
+        .confirm-section h4 {
+            font-size: 17px;
+            margin: 0 0 12px;
+        }
+
+    .confirm-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+    }
+
+        .confirm-line:last-child {
+            border-bottom: 0;
+        }
+
+        .confirm-line span {
+            color: #6b7280;
+        }
+
+        .confirm-line strong {
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+    .confirm-total {
+        font-size: 22px;
+        color: #15803d;
+        font-weight: 800;
+    }
+
+    .customer-input {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        padding: 12px;
+        font-size: 16px;
+        margin-top: 7px;
+    }
+
+        .customer-input:focus {
+            outline: 2px solid #86efac;
+            border-color: #16a34a;
+        }
+
+    .field-help {
+        color: #6b7280;
+        font-size: 12px;
+        margin-top: 7px;
+        line-height: 1.5;
+    }
+
+    .required {
+        color: #dc2626;
+    }
+
+    .service-row {
+        display: grid;
+        grid-template-columns: 24px minmax(0, 1fr) auto;
+        gap: 9px;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .service-row:last-child {
+            border-bottom: 0;
+        }
+
+        .service-row input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+        }
+
+    .service-name {
+        font-weight: 650;
+    }
+
+    .service-price {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 3px;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .quantity-control button {
+            width: 29px;
+            height: 29px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #f9fafb;
+            cursor: pointer;
+        }
+
+        .quantity-control input {
+            width: 37px;
+            text-align: center;
+            padding: 5px 1px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+    .service-subtotal {
+        color: #15803d;
+        font-weight: 700;
+        text-align: right;
+        margin-top: 10px;
+    }
+
+    .contact-card {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 14px;
+    }
+
+        .contact-card h4 {
+            margin: 0 0 8px;
+        }
+
+    .contact-phone {
+        font-size: 18px;
+        font-weight: 800;
+        color: #166534;
+        overflow-wrap: anywhere;
+    }
+
+    .contact-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+        .contact-actions a {
+            flex: 1;
+        }
+
+    .confirm-actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .confirm-error {
+        display: none;
+        color: #b91c1c;
+        background: #fee2e2;
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 12px;
+        font-size: 14px;
+    }
+
+        .confirm-error.show {
+            display: block;
+        }
+
+    @@media (max-width: 1000px) {
+        .slot-grid {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .booking-page {
+            padding: 10px;
+        }
+
+        .slot-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .slot {
+            min-height: 42px;
+        }
+
+        .floating-summary {
+            right: 10px;
+            bottom: 10px;
+            width: auto;
+            left: 10px;
+            max-width: none;
+            max-height: 65vh;
+        }
+
+        .confirm-modal {
+            padding: 16px;
+        }
+
+            .confirm-modal h3 {
+                font-size: 22px;
+            }
+
+        .confirm-actions .btn-booking {
+            flex: 1;
+        }
+    }
+</style>
+
+<div class="booking-page">
+    <div class="header">
+        <div>
+            <h2>Đặt sân cầu lông</h2>
+            <div class="subtitle">
+                Chọn sân và các khung giờ liên tiếp bạn muốn đặt.
+            </div>
+        </div>
+        <strong>Hệ thống sân tiêu chuẩn · Mở cửa 24/24</strong>
+    </div>
+
+    <div class="panel date-panel">
+        <label for="bookingDate"><strong>Ngày đặt sân:</strong></label>
+
+        <input type="date"
+               id="bookingDate"
+               value="@selectedDate"
+               min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+
+        <button type="button" id="todayButton"
+                class="btn-booking btn-gray">
+            Hôm nay
+        </button>
+    </div>
+
+    <div class="price-list">
+        <strong>Bảng giá:</strong>
+        <span>00:00–06:00: 75.000đ/giờ</span>
+        <span>06:00–16:00: 65.000đ/giờ</span>
+        <span>16:00–22:00: 140.000đ/giờ</span>
+        <span>22:00–24:00: 90.000đ/giờ</span>
+    </div>
+
+    <div class="legend">
+        <div><span class="lg-empty"></span>Slot trống</div>
+        <div><span class="lg-selected"></span>Đang chọn</div>
+        <div><span class="lg-booked"></span>Đã đặt</div>
+        <div><span class="lg-locked"></span>Đã khóa</div>
+    </div>
+
+    <div id="notice" class="notice" role="status"></div>
+
+    <div id="courtsContainer">
+        @foreach (var court in courts)
+        {
+            <section class="court-card">
+                <div class="court-heading">
+                    <h5>@court.First().CourtName</h5>
+                    <span class="muted">Giờ hoạt động: 05:30 - 23:00</span>
+                </div>
+
+                <div class="slot-grid">
+                    @foreach (var slot in court.OrderBy(s => s.SlotIndex))
+                    {
+                        // 1. CHUYỂN ĐỔI THỜI GIAN ĐỂ XỬ LÝ LOGIC
+                        TimeSpan slotStart;
+                        bool isValidTime = TimeSpan.TryParse(slot.StartTime.ToString(), out slotStart);
+
+                        // 2. LỌC KHUNG GIỜ MỞ CỬA (05:30 đến 23:00)
+                        TimeSpan openTime = new TimeSpan(5, 30, 0);
+                        TimeSpan closeTime = new TimeSpan(23, 0, 0);
+
+                        if (isValidTime && (slotStart < openTime || slotStart >= closeTime))
+                        {
+                            // Lệnh continue sẽ bỏ qua hoàn toàn các slot từ 00:00-05:00 và 23:00-24:00
+                            continue;
+                        }
+
+                        // 3. KHÓA CÁC KHUNG GIỜ ĐÃ QUÁ HẠN (Nếu chọn ngày hôm nay)
+                        bool isPast = false;
+                        if (DateTime.TryParse(selectedDate, out DateTime parsedDate) && parsedDate.Date == DateTime.Today)
+                        {
+                            if (isValidTime && slotStart <= DateTime.Now.TimeOfDay)
+                            {
+                                isPast = true;
+                            }
+                        }
+
+                        // 4. ĐỒNG BỘ TRẠNG THÁI STATUS
+                        string currentStatus = slot.Status; // Nhận "empty", "booked" từ Backend
+                        
+                        // Nếu slot đang trống nhưng giờ đã qua -> Ép thành trạng thái "locked"
+                        if (isPast && currentStatus == "empty")
+                        {
+                            currentStatus = "locked";
+                        }
+
+                        <button type="button"
+                                class="slot @currentStatus @(isPast && currentStatus == "locked" ? "opacity-50" : "")"
+                                data-court-id="@slot.CourtId"
+                                data-court-name="@slot.CourtName"
+                                data-index="@slot.SlotIndex"
+                                data-start="@slot.StartTime"
+                                data-end="@slot.EndTime"
+                                data-status="@currentStatus"
+                                data-price-slot="@slot.PricePerSlot.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                disabled="@(currentStatus != "empty")"
+                                title="@(isPast && currentStatus == "locked" ? "Khung giờ đã qua" : $"{slot.StartTime} - {slot.EndTime}")">
+
+                            <span class="slot-time">@slot.StartTime</span>
+                            
+                            <!-- Bổ sung text nhỏ trực quan vào nút bấm -->
+                            @if (currentStatus == "booked")
+                            {
+                                <span style="font-size: 10px; font-weight: 600; margin-top: 3px;">Đã đặt</span>
+                            }
+                            else if (isPast && currentStatus == "locked")
+                            {
+                                <span style="font-size: 10px; font-weight: 500; margin-top: 3px;">Đã qua</span>
+                            }
+                        </button>
+                    }
+                </div>
+            </section>
+        }
+    </div>
+</div>
+
+<!-- Thông tin đặt sân nổi: xuất hiện sau khi chọn giờ -->
+<section id="floatingSummary" class="floating-summary" aria-label="Thông tin đặt sân">
+    <div class="floating-heading">
+        <h5>Thông tin đặt sân</h5>
+        <button type="button" id="closeSummaryButton" class="floating-close" aria-label="Đóng">×</button>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-item">
+            <div class="summary-label">Sân</div>
+            <div class="summary-value" id="summaryCourt">Chưa chọn</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Ngày</div>
+            <div class="summary-value" id="summaryDate">@selectedDate</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Giờ bắt đầu</div>
+            <div class="summary-value" id="summaryStart">--:--</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Giờ kết thúc</div>
+            <div class="summary-value" id="summaryEnd">--:--</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Thời lượng</div>
+            <div class="summary-value" id="summaryDuration">0 giờ</div>
+        </div>
+    </div>
+
+    <div class="floating-total">
+        <div class="summary-label">Tiền sân</div>
+        <strong id="summaryPrice">0đ</strong>
+    </div>
+
+    <div class="floating-actions">
+        <button type="button" id="clearButton" class="btn-booking btn-gray">Bỏ chọn</button>
+
+        <button type="button" id="nextButton" class="btn-booking btn-green" disabled>
+            Tiếp theo
+        </button>
+    </div>
+</section>
+
+<!-- Giao diện xác nhận đặt sân -->
+<div class="modal-backdrop-custom" id="confirmBackdrop">
+    <div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <h3 id="confirmTitle">Xác nhận đặt sân</h3>
+
+        <div class="confirm-subtitle">
+            Kiểm tra thông tin sân, chọn dịch vụ nếu cần và nhập số điện thoại.
+        </div>
+
+        <section class="confirm-section">
+            <h4>1. Thông tin đặt sân</h4>
+
+            <div class="confirm-line">
+                <span>Sân</span>
+                <strong id="confirmCourt">--</strong>
+            </div>
+
+            <div class="confirm-line">
+                <span>Ngày đặt</span>
+                <strong id="confirmDate">--</strong>
+            </div>
+
+            <div class="confirm-line">
+                <span>Giờ bắt đầu</span>
+                <strong id="confirmStart">--</strong>
+            </div>
+
+            <div class="confirm-line">
+                <span>Giờ kết thúc</span>
+                <strong id="confirmEnd">--</strong>
+            </div>
+
+            <div class="confirm-line">
+                <span>Tổng thời lượng</span>
+                <strong id="confirmDuration">--</strong>
+            </div>
+
+            <div class="confirm-line">
+                <span>Tiền sân</span>
+                <strong id="confirmPrice">--</strong>
+            </div>
+        </section>
+
+        <section class="confirm-section">
+            <h4>2. Dịch vụ ăn uống & Tiện ích</h4>
+            <div class="field-help">
+                Chọn món và điều chỉnh số lượng phục vụ tại sân.
+            </div>
+
+            @if (ViewBag.Services != null)
+            {
+                foreach (var svc in ViewBag.Services)
+                {
+                    <div class="service-row" data-service-id="@svc.Id" data-price="@svc.Price.ToString("0")">
+                        <input type="checkbox" class="service-check" aria-label="Chọn @svc.Name" />
+                        <div>
+                            <div class="service-name">@svc.Name</div>
+                            <div class="service-price">@svc.Price.ToString("N0")đ / @svc.Unit</div>
+                        </div>
+                        <div class="quantity-control">
+                            <button type="button" class="quantity-minus" aria-label="Giảm số lượng">−</button>
+                            <input type="number" class="service-quantity" value="1" min="1" max="@svc.Stock" aria-label="Số lượng" />
+                            <button type="button" class="quantity-plus" aria-label="Tăng số lượng">+</button>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-muted small py-2">Hiện tại sân chưa cung cấp dịch vụ nào.</div>
+            }
+
+            <div class="service-subtotal">
+                Tiền dịch vụ: <span id="serviceTotal">0đ</span>
+            </div>
+        </section>
+
+        <section class="confirm-section">
+            <h4>3. Thông tin khách hàng</h4>
+
+            <label for="customerPhone">
+                Số điện thoại của bạn <span class="required">*</span>
+            </label>
+
+            <input type="tel"
+                   id="customerPhone"
+                   class="customer-input"
+                   placeholder="Ví dụ: 0912345678"
+                   maxlength="13"
+                   autocomplete="tel"
+                   inputmode="tel"
+                   required />
+
+            <div class="field-help">
+                Vui lòng nhập số điện thoại hợp lệ gồm 10 chữ số.
+            </div>
+
+            <div id="phoneError" class="confirm-error" role="alert"></div>
+        </section>
+
+        <section class="contact-card">
+            <h4>4. Liên hệ sân cầu lông</h4>
+
+            <div class="field-help">
+                Nếu cần hỗ trợ trực tiếp, vui lòng liên hệ quản lý sân.
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(phoneDigits))
+            {
+                <div class="contact-phone">@courtPhone</div>
+
+                <div class="contact-actions">
+                    <a class="btn-booking btn-green" href="tel:@phoneDigits">
+                        Gọi điện cho sân
+                    </a>
+
+                    @if (!string.IsNullOrWhiteSpace(zaloDigits))
+                    {
+                        <a class="btn-booking btn-gray"
+                           href="https://zalo.me/@zaloDigits"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            Mở Zalo
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="contact-phone">
+                    0912.345.678
+                </div>
+            }
+        </section>
+
+        <section class="confirm-section">
+            <h4>5. Tổng thanh toán</h4>
+
+            <div class="confirm-line">
+                <span>Tiền sân</span>
+                <strong id="finalCourtPrice">0đ</strong>
+            </div>
+
+            <div class="confirm-line">
+                <span>Tiền dịch vụ</span>
+                <strong id="finalServicePrice">0đ</strong>
+            </div>
+
+            <div class="confirm-line">
+                <span><strong>Tổng cộng</strong></span>
+                <strong id="finalTotal" class="confirm-total">0đ</strong>
+            </div>
+        </section>
+
+        <div id="confirmError" class="confirm-error" role="alert"></div>
+
+        <div class="confirm-actions">
+            <button type="button" id="cancelConfirmButton" class="btn-booking btn-gray">
+                Quay lại
+            </button>
+
+            <button type="button" id="confirmButton" class="btn-booking btn-green">
+                Xác nhận đặt
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/select-slot.js" asp-append-version="true"></script>
+}

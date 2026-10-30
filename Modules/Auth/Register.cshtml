@@ -1,0 +1,54 @@
+﻿@model MyCourtBooking.Core.Entities.User
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="card-body p-4">
+                <h3 class="fw-bold text-center mb-4" style="color: #0f1f3d;">Đăng ký tài khoản</h3>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger py-2 small mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> @ViewBag.Error
+                    </div>
+                }
+
+                <form action="/Auth/Register" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Họ và tên</label>
+                        <input type="text" name="FullName" class="form-control py-2" placeholder="Nguyễn Văn A" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" name="Email" class="form-control py-2" placeholder="name@example.com" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Số điện thoại</label>
+                        <input type="text" name="PhoneNumber" class="form-control py-2" placeholder="0987654321" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mật khẩu</label>
+                        <input type="password" name="password" class="form-control py-2" placeholder="••••••••" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2 mt-2 rounded-pill">
+                        Đăng ký ngay
+                    </button>
+
+                    <div class="text-center mt-3 small">
+                        Đã có tài khoản? <a href="/?openAuth=true" class="text-success fw-bold text-decoration-none">Đăng nhập ngay</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

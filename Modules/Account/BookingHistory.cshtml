@@ -1,0 +1,143 @@
+﻿@model IEnumerable<MyCourtBooking.Modules.Account.BookingHistoryItemViewModel>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Lịch Sử Đặt Sân";
+}
+
+<div class="container my-4">
+    <div class="row g-4">
+        <!-- SIDEBAR -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 text-center" style="border-radius: 12px;">
+                <h6 class="fw-bold mb-0 text-primary">TÀI KHOẢN CỦA TÔI</h6>
+                <div class="list-group list-group-flush text-start small mt-3">
+                    <a href="/Account/Profile" class="list-group-item list-group-item-action fw-semibold border-0 rounded-2 mb-1">
+                        <i class="bi bi-person me-2"></i> Hồ sơ cá nhân
+                    </a>
+                    <a href="/Account/BookingHistory" class="list-group-item list-group-item-action active fw-semibold border-0 rounded-2 mb-1">
+                        <i class="bi bi-clock-history me-2"></i> Lịch sử đặt sân
+                    </a>
+                    <a href="/Account/ChangePassword" class="list-group-item list-group-item-action fw-semibold border-0 rounded-2">
+                        <i class="bi bi-shield-lock me-2"></i> Đổi mật khẩu
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- DANH SÁCH ĐƠN ĐẶT -->
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 12px;">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-journal-text text-primary me-2"></i>Lịch sử đặt sân của bạn</h5>
+
+                @if (!Model.Any())
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-calendar-x fs-1 text-muted mb-2"></i>
+                        <p class="text-muted small">Bạn chưa từng đặt sân nào trên hệ thống.</p>
+                        <a href="/" class="btn btn-primary btn-sm rounded-pill px-4">Đặt sân ngay</a>
+                    </div>
+                }
+                else
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="accordion" id="bookingHistoryAccordion">
+                        @foreach (var item in Model)
+                        {
+                            string statusBadge = item.Status switch
+                            {
+                                "Pending" => "bg-warning text-dark",
+                                "Confirmed" => "bg-primary text-white",
+                                "Completed" => "bg-success text-white",
+                                "Cancelled" => "bg-secondary text-white",
+                                _ => "bg-light text-dark"
+                            };
+
+                            string statusText = item.Status switch
+                            {
+                                "Pending" => "Chờ xác nhận",
+                                "Confirmed" => "Đã xác nhận",
+                                "Completed" => "Đã hoàn thành",
+                                "Cancelled" => "Đã hủy",
+                                _ => item.Status
+                            };
+
+                            <div class="accordion-item border rounded mb-3 overflow-hidden shadow-sm">
+                                <h2 class="accordion-header" id="heading_@item.BookingId">
+                                    <button class="accordion-button collapsed bg-light p-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@item.BookingId">
+                                        <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                            <div>
+                                                <span class="fw-bold text-primary me-2">#@item.BookingCode</span>
+                                                <small class="text-muted">(@item.BookingDate.ToString("dd/MM/yyyy HH:mm"))</small>
+                                            </div>
+                                            <div>
+                                                <span class="badge @statusBadge me-2">@statusText</span>
+                                                <span class="fw-bold text-danger">@item.FinalAmount.ToString("N0")đ</span>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="collapse_@item.BookingId" class="accordion-collapse collapse" data-bs-parent="#bookingHistoryAccordion">
+                                    <div class="accordion-body p-3">
+                                        <h6 class="fw-bold small text-muted mb-2">Chi tiết sân đặt:</h6>
+                                        <ul class="list-group list-group-flush mb-3 small">
+                                            @foreach (var detail in item.Details)
+                                            {
+                                                <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <div class="fw-bold">@detail.CourtName</div>
+                                                        <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>@detail.Address</small>
+                                                        <div class="text-primary mt-1"><i class="bi bi-clock me-1"></i>Ngày chơi: <b>@detail.PlayDate.ToString("dd/MM/yyyy")</b> | Khung giờ: <b>@detail.TimeSlotString</b></div>
+                                                    </div>
+                                                    <span class="fw-semibold text-dark">@detail.Price.ToString("N0")đ</span>
+                                                </li>
+                                            }
+                                        </ul>
+
+                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                            <span class="small text-muted">Thanh toán: <b>@item.PaymentMethod</b> (@item.PaymentStatus)</span>
+                                            
+                                            @if (item.CanCancel)
+                                            {
+                                                <button type="button" onclick="cancelBooking(@item.BookingId)" class="btn btn-outline-danger btn-sm rounded-pill fw-semibold">
+                                                    <i class="bi bi-x-circle me-1"></i> Hủy đơn đặt
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function cancelBooking(id) {
+            if (!confirm('Bạn có chắc chắn muốn hủy đơn đặt sân này không? Hành động này không thể hoàn tác!')) return;
+
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: '/Account/CancelBooking',
+                type: 'POST',
+                data: { bookingId: id },
+                headers: { "RequestVerificationToken": token },
+                success: function (res) {
+                    if (res.success) {
+                        alert(res.message);
+                        window.location.reload();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('Lỗi hệ thống khi hủy đơn!');
+                }
+            });
+        }
+    </script>
+}

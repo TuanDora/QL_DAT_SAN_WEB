@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noImplicitAny": false
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot"
+  ],
+  
+}
