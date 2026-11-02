@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyCourtBooking.Core.Entities
+namespace MyCourtBooking.Models.Entities
 {
     public class Payment
     {

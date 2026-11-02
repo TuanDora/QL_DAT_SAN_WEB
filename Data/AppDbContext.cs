@@ -2,6 +2,7 @@
 using System.Reflection.Emit;
 using MyCourtBooking.Core.Entities;
 using MyCourtBooking.Core.Enums;
+using MyCourtBooking.Models.Entities;
 
 namespace MyCourtBooking.Data
 {

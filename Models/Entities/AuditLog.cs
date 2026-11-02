@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyCourtBooking.Core.Entities
+namespace MyCourtBooking.Models.Entities
 {
     public class AuditLog
     {

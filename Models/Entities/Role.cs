@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MyCourtBooking.Core.Entities;
+using System.ComponentModel.DataAnnotations;
 
-namespace MyCourtBooking.Core.Entities
+namespace MyCourtBooking.Models.Entities
 {
     // Bảng Vai trò người dùng (Admin, CourtOwner, Customer)
     public class Role

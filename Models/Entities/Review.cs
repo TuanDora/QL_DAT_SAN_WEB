@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using MyCourtBooking.Core.Entities;
 
-namespace MyCourtBooking.Core.Entities
+namespace MyCourtBooking.Models.Entities
 {
     // Đánh giá sân
     public class Review

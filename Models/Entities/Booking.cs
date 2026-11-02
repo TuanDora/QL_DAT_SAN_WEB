@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using MyCourtBooking.Core.Enums;
 
-namespace MyCourtBooking.Core.Entities
+namespace MyCourtBooking.Models.Entities
 {
     public class Booking
     {

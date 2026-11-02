@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyCourtBooking.Core.Entities
+namespace MyCourtBooking.Models.Entities
 {
     [Table("Services")] // Ép Entity Framework ánh xạ chính xác vào bảng 'Services'
     public class Service

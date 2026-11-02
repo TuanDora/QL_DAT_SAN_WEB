@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using MyCourtBooking.Core.Entities;
 
-namespace MyCourtBooking.Core.Entities
+namespace MyCourtBooking.Models.Entities
 {
     // Hình ảnh của sân
     public class CourtImage
