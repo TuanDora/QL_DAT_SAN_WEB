@@ -25,11 +25,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Modules\Account\" />
-	  <Folder Include="Modules\Auth\" />
-	  <Folder Include="Modules\Bookings\" />
-	  <Folder Include="Modules\Home\" />
-	  <Folder Include="Modules\Shared\" />
 	  <Folder Include="wwwroot\image\courts\" />
 	</ItemGroup>
 

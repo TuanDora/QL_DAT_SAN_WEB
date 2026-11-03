@@ -11,7 +11,6 @@ using System;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using MyCourtBooking.Modules.Bookings;
 
 namespace MyCourtBooking.Controllers
 {

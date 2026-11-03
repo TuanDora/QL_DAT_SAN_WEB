@@ -4,7 +4,7 @@ using MyCourtBooking.Models.ViewModels;
 using System;
 using System.Threading.Tasks;
 
-namespace MyCourtBooking.Modules.Bookings
+namespace MyCourtBooking.Models.Services
 {
     public interface IBookingService
     {

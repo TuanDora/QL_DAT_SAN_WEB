@@ -7,7 +7,7 @@ using MyCourtBooking.Models.ViewModels;
 using System.Globalization;
 
 
-namespace MyCourtBooking.Modules.Bookings
+namespace MyCourtBooking.Models.Services
 {
     public class BookingService : IBookingService
     {

@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using MyCourtBooking.Models.Data;
 using MyCourtBooking.Models.Entities;
 using MyCourtBooking.Models.Services;
-using MyCourtBooking.Modules.Bookings;
-using MyCourtBooking.Modules.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,28 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Cấu hình Custom View Location cho Kiến trúc Module
-builder.Services.Configure<RazorViewEngineOptions>(options =>
-{
-    options.ViewLocationExpanders.Add(new ModuleViewLocationExpander());
-});
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie(options =>
-{
-    options.LoginPath = "/Auth/Login";
-    options.LogoutPath = "/Auth/Logout";
-})
-.AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
-{
-    // Thay thế ClientId và ClientSecret từ Google Developer Console
-    options.ClientId = "915168180496-ctg7hq4bcv0inkjm0tbukm572imhr1ov.apps.googleusercontent.com";
-    options.ClientSecret = "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";
-});
 
 // 4. ĐĂNG KÝ CÁC SERVICE VÀO DEPENDENCY INJECTION (Sửa triệt để lỗi Unable to resolve service)
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -53,10 +29,6 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddControllersWithViews();
-builder.Services.Configure<RazorViewEngineOptions>(options =>
-{
-    options.ViewLocationExpanders.Add(new MyCourtBooking.Modules.Shared.ModuleViewLocationExpander());
-});
 var app = builder.Build();
 
 
