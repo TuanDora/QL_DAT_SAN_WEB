@@ -66,7 +66,7 @@ namespace MyCourtBooking.Models.Services
             }
 
             // 3.3. Lọc theo Loại sân (Sửa ép kiểu Enum chuẩn EF Core)
-            if (courtTypeId.HasValue && courtTypeId.Value > 0)
+            if (courtTypeId.HasValue)
             {
                 var courtTypeEnum = (CourtType)courtTypeId.Value;
                 query = query.Where(c => c.CourtType == courtTypeEnum);

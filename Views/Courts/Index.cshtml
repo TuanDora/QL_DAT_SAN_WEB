@@ -55,7 +55,7 @@
                 <div class="col-md-2">
                     <label class="form-label small text-muted fw-semibold mb-1">Loại sân:</label>
                     <select name="courtTypeId" class="form-select bg-light">
-                        <option value="0">-- Tất cả loại sân --</option>
+                        <option value="">-- Tất cả loại sân --</option>
                         @foreach (var type in courtTypes)
                         {
                             <option value="@type.Id" selected="@(ViewBag.SelectedCourtTypeId == type.Id ? "selected" : null)">@type.Name</option>
