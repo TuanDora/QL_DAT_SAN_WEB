@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MyCourtBooking.Modules.Bookings
+namespace MyCourtBooking.Models.DTOs
 {
     public class SelectSlotViewModel
     {

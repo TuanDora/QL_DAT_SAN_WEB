@@ -1,4 +1,4 @@
-﻿namespace MyCourtBooking.Modules.Bookings.ApiModels
+﻿namespace MyCourtBooking.Models.ViewModels
 {
     public  class SlotViewModel
     {

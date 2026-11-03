@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyCourtBooking.Modules.Auth
+namespace MyCourtBooking.Models.ViewModels
 {
     public class ChangePasswordViewModel
     {

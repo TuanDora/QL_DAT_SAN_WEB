@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using MyCourtBooking.Core.Data;
 using MyCourtBooking.Core.Entities;
 using MyCourtBooking.Core.Enums;
-using MyCourtBooking.Modules.Auth;
+using MyCourtBooking.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyCourtBooking.Models.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

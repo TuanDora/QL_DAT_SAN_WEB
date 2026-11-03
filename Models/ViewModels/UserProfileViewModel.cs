@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyCourtBooking.Modules.Account
+namespace MyCourtBooking.Models.ViewModels
 {
     public class UserProfileViewModel
     {

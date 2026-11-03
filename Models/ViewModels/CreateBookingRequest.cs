@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MyCourtBooking.Modules.Bookings
+namespace MyCourtBooking.Models.ViewModels
 {
     public  class CreateBookingRequest
     {

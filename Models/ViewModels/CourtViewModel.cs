@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MyCourtBooking.Modules.Courts
+namespace MyCourtBooking.Models.ViewModels
 {
     // ViewModel hiển thị thẻ sân ở danh sách
     public class CourtViewModel

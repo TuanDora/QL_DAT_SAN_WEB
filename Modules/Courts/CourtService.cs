@@ -2,6 +2,7 @@
 using MyCourtBooking.Core.Entities;
 using MyCourtBooking.Core.Enums;
 using MyCourtBooking.Core.Data;
+using MyCourtBooking.Models.ViewModels;
 
 namespace MyCourtBooking.Modules.Courts
 {

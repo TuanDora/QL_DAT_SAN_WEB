@@ -1,4 +1,4 @@
-namespace MyCourtBooking.Models
+namespace MyCourtBooking.Models.ViewModels
 {
     public class ErrorViewModel
     {

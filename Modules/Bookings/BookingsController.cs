@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using MyCourtBooking.Core.Data;
 using MyCourtBooking.Core.Enums;
 using MyCourtBooking.Models;
+using MyCourtBooking.Models.ViewModels;
 using MyCourtBooking.Services;
 using System;
 using System.Security.Claims;
@@ -55,7 +56,7 @@ namespace MyCourtBooking.Modules.Bookings
             // ==========================================================
             // 2. TỰ ĐỘNG TẠO SƠ ĐỒ 48 SLOT ẢO (Xóa bỏ lỗi _context.TimeSlots)
             // ==========================================================
-            var allSlots = new List<MyCourtBooking.Modules.Bookings.SlotViewModel>();
+            var allSlots = new List<Models.DTOs.SlotViewModel>();
 
             TimeSpan openTime = new TimeSpan(5, 30, 0);  // Sân mở cửa 05:30
             TimeSpan closeTime = new TimeSpan(23, 0, 0); // Sân đóng cửa 23:00

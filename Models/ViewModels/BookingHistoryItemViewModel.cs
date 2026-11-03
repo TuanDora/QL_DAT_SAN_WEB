@@ -1,4 +1,4 @@
-﻿namespace MyCourtBooking.Modules.Account
+﻿namespace MyCourtBooking.Models.ViewModels
 {
     public class BookingHistoryItemViewModel
     {
