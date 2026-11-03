@@ -48,15 +48,17 @@ namespace MyCourtBooking.Controllers
             // 1. TÌM CÁC KHUNG GIỜ ĐÃ ĐƯỢC ĐẶT (Đã sửa lỗi SlotId)
             // Lấy danh sách giờ bắt đầu & kết thúc của các đơn đặt sân
             // ==========================================================
-            var bookedTimes = await _context.Bookings
-                .Where(b => b.CourtId == courtId && b.BookingDate.Date == selectedDate.Date && b.Status != BookingStatus.Cancelled)
-                .Select(b => new { b.StartTime, b.EndTime }) // Trích xuất StartTime và EndTime từ Database
+            var bookedTimes = await _context.BookingDetails
+                .Where(bd => bd.CourtId == courtId
+                    && bd.PlayDate.Date == selectedDate.Date
+                    && bd.Booking.Status != BookingStatus.Cancelled)
+                .Select(bd => new { bd.StartTime, bd.EndTime })
                 .ToListAsync();
 
-			// ==========================================================
-			// 2. TỰ ĐỘNG TẠO SƠ ĐỒ 48 SLOT ẢO (Xóa bỏ lỗi _context.TimeSlots)
-			// ==========================================================
-			var allSlots = new List<SlotViewModel>();
+            // ==========================================================
+            // 2. TỰ ĐỘNG TẠO SƠ ĐỒ 48 SLOT ẢO (Xóa bỏ lỗi _context.TimeSlots)
+            // ==========================================================
+            var allSlots = new List<SlotViewModel>();
 
 			TimeSpan openTime = new TimeSpan(5, 30, 0);  // Sân mở cửa 05:30
             TimeSpan closeTime = new TimeSpan(23, 0, 0); // Sân đóng cửa 23:00
@@ -69,7 +71,7 @@ namespace MyCourtBooking.Controllers
 
                 // KIỂM TRA TRẠNG THÁI KHUNG GIỜ (Trống / Đã đặt / Đã qua)
                 // Khung giờ bị trùng nếu nó nằm bên trong bất kỳ thời gian Booking nào đã lấy ở Bước 1
-                bool isBooked = bookedTimes.Any(b => currentStartTime >= b.StartTime && currentStartTime < b.EndTime);
+                bool isBooked = bookedTimes.Any(b => currentStartTime < b.EndTime && currentEndTime > b.StartTime);
                 bool isPast = (selectedDate.Date == DateTime.Today) && (currentStartTime <= DateTime.Now.TimeOfDay);
 
                 string status = "empty";

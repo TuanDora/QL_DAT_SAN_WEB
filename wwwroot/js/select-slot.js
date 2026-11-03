@@ -436,6 +436,10 @@
                             confirmError.textContent = data.result.message || "Đặt sân thất bại. Vui lòng thử lại.";
                             confirmError.classList.add("show");
                         }
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
+
                         return;
                     }
 
