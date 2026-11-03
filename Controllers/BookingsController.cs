@@ -77,11 +77,13 @@ namespace MyCourtBooking.Controllers
                 else if (isPast) status = "locked";
 
                 // TÍNH GIÁ TIỀN CHUẨN XÁC THEO KHUNG GIỜ
-                decimal price = 65000;
-                if (currentStartTime.Hours < 6) price = 75000; // 00:00 - 06:00
-                else if (currentStartTime.Hours >= 6 && currentStartTime.Hours < 16) price = 65000; // 06:00 - 16:00
-                else if (currentStartTime.Hours >= 16 && currentStartTime.Hours < 22) price = 140000; // 16:00 - 22:00
-                else if (currentStartTime.Hours >= 22) price = 90000; // 22:00 - 24:00
+                // TÍNH GIÁ TIỀN CHO 30 PHÚT (LẤY GIÁ THEO GIỜ / 2)
+                decimal pricePerHour = 65000;
+                if (currentStartTime.Hours < 6) pricePerHour = 75000; // 00:00 - 06:00
+                else if (currentStartTime.Hours >= 6 && currentStartTime.Hours < 16) pricePerHour = 65000; // 06:00 - 16:00
+                else if (currentStartTime.Hours >= 16 && currentStartTime.Hours < 22) pricePerHour = 140000; // 16:00 - 22:00
+                else if (currentStartTime.Hours >= 22) pricePerHour = 90000; // 22:00 - 24:00
+                decimal price = pricePerHour / 2m; // Chia đôi vì mỗi slot ứng với 30 phút
 
                 // Thêm Slot vào danh sách hiển thị cho View
                 allSlots.Add(new SlotViewModel
