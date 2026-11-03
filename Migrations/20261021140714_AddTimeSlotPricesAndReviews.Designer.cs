@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MyCourtBooking.Core.Data;
+using MyCourtBooking.Models.Data;
 
 #nullable disable
 
@@ -25,7 +25,7 @@ namespace MyCourtBooking.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Booking", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Booking", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,7 +89,7 @@ namespace MyCourtBooking.Migrations
                     b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.BookingDetail", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.BookingDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -124,7 +124,7 @@ namespace MyCourtBooking.Migrations
                     b.ToTable("BookingDetails");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Court", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Court", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -248,7 +248,7 @@ namespace MyCourtBooking.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.CourtImage", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.CourtImage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -274,7 +274,7 @@ namespace MyCourtBooking.Migrations
                     b.ToTable("CourtImage");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Payment", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Payment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -313,7 +313,7 @@ namespace MyCourtBooking.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Review", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -346,7 +346,7 @@ namespace MyCourtBooking.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.TimeSlotPrice", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.TimeSlotPrice", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -376,7 +376,7 @@ namespace MyCourtBooking.Migrations
                     b.ToTable("TimeSlotPrices");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.User", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -450,15 +450,15 @@ namespace MyCourtBooking.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Booking", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Booking", b =>
                 {
-                    b.HasOne("MyCourtBooking.Core.Entities.Court", "Court")
+                    b.HasOne("MyCourtBooking.Models.Entities.Court", "Court")
                         .WithMany("Bookings")
                         .HasForeignKey("CourtId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MyCourtBooking.Core.Entities.User", "User")
+                    b.HasOne("MyCourtBooking.Models.Entities.User", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -469,15 +469,15 @@ namespace MyCourtBooking.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.BookingDetail", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.BookingDetail", b =>
                 {
-                    b.HasOne("MyCourtBooking.Core.Entities.Booking", "Booking")
+                    b.HasOne("MyCourtBooking.Models.Entities.Booking", "Booking")
                         .WithMany("BookingDetails")
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MyCourtBooking.Core.Entities.Court", "Court")
+                    b.HasOne("MyCourtBooking.Models.Entities.Court", "Court")
                         .WithMany()
                         .HasForeignKey("CourtId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -488,9 +488,9 @@ namespace MyCourtBooking.Migrations
                     b.Navigation("Court");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.CourtImage", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.CourtImage", b =>
                 {
-                    b.HasOne("MyCourtBooking.Core.Entities.Court", "Court")
+                    b.HasOne("MyCourtBooking.Models.Entities.Court", "Court")
                         .WithMany("CourtImages")
                         .HasForeignKey("CourtId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -499,9 +499,9 @@ namespace MyCourtBooking.Migrations
                     b.Navigation("Court");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Payment", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Payment", b =>
                 {
-                    b.HasOne("MyCourtBooking.Core.Entities.Booking", "Booking")
+                    b.HasOne("MyCourtBooking.Models.Entities.Booking", "Booking")
                         .WithMany()
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -510,15 +510,15 @@ namespace MyCourtBooking.Migrations
                     b.Navigation("Booking");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Review", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Review", b =>
                 {
-                    b.HasOne("MyCourtBooking.Core.Entities.Court", "Court")
+                    b.HasOne("MyCourtBooking.Models.Entities.Court", "Court")
                         .WithMany("Reviews")
                         .HasForeignKey("CourtId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MyCourtBooking.Core.Entities.User", "User")
+                    b.HasOne("MyCourtBooking.Models.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -529,9 +529,9 @@ namespace MyCourtBooking.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.TimeSlotPrice", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.TimeSlotPrice", b =>
                 {
-                    b.HasOne("MyCourtBooking.Core.Entities.Court", "Court")
+                    b.HasOne("MyCourtBooking.Models.Entities.Court", "Court")
                         .WithMany()
                         .HasForeignKey("CourtId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -540,12 +540,12 @@ namespace MyCourtBooking.Migrations
                     b.Navigation("Court");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Booking", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Booking", b =>
                 {
                     b.Navigation("BookingDetails");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.Court", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.Court", b =>
                 {
                     b.Navigation("Bookings");
 
@@ -554,7 +554,7 @@ namespace MyCourtBooking.Migrations
                     b.Navigation("Reviews");
                 });
 
-            modelBuilder.Entity("MyCourtBooking.Core.Entities.User", b =>
+            modelBuilder.Entity("MyCourtBooking.Models.Entities.User", b =>
                 {
                     b.Navigation("Bookings");
                 });

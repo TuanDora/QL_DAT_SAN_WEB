@@ -1,11 +1,11 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model IEnumerable<MyCourtBooking.Core.Entities.User>
+@model IEnumerable<MyCourtBooking.Models.Entities.User>
 @{
     Layout = "/Modules/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Quản lý Tài khoản & Phân quyền";
 
-    var staffList = Model?.Where(u => u.Role == "Admin" || u.Role == "Staff").ToList() ?? new List<MyCourtBooking.Core.Entities.User>();
-    var customerList = Model?.Where(u => u.Role != "Admin" && u.Role != "Staff").ToList() ?? new List<MyCourtBooking.Core.Entities.User>();
+    var staffList = Model?.Where(u => u.Role == "Admin" || u.Role == "Staff").ToList() ?? new List<MyCourtBooking.Models.Entities.User>();
+    var customerList = Model?.Where(u => u.Role != "Admin" && u.Role != "Staff").ToList() ?? new List<MyCourtBooking.Models.Entities.User>();
 }
 
 <div class="container-fluid px-0 py-2">

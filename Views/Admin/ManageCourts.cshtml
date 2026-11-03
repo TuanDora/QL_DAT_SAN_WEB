@@ -1,9 +1,9 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model IEnumerable<MyCourtBooking.Core.Entities.Court>
+@model IEnumerable<MyCourtBooking.Models.Entities.Court>
 @{
     Layout = "/Modules/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Quản lý Sân";
-    var courtTypes = ViewBag.CourtTypes as List<MyCourtBooking.Core.Enums.CourtType> ?? new List<MyCourtBooking.Core.Enums.CourtType>();
+    var courtTypes = ViewBag.CourtTypes as List<MyCourtBooking.Models.Enums.CourtType> ?? new List<MyCourtBooking.Models.Enums.CourtType>();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">        
