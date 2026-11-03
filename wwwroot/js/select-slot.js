@@ -447,19 +447,36 @@
 
                     var courtAmount = Number(data.result.totalPrice || totalPrice());
                     var grandTotal = courtAmount + selectedServiceTotal;
+                    var bookingCode = data.result.bookingCode;
 
-                    showNotice(
-                        "🎉 Đặt sân thành công! Mã đặt sân: " + data.result.bookingCode +
-                        ". Thời gian: " + data.result.startTime + " - " + data.result.endTime +
-                        ". Tiền sân: " + money(courtAmount) +
-                        ". Tiền dịch vụ: " + money(selectedServiceTotal) +
-                        ". Tổng dự kiến: " + money(grandTotal) + ".",
-                        "success"
-                    );
+                    // Ẩn bảng xác nhận cũ nếu có
+                    if (backdrop) backdrop.classList.remove("show");
 
-                    window.setTimeout(function () {
-                        window.location.reload();
-                    }, 3500);
+                    // ĐIỀN THÔNG TIN VÀO MODAL QR
+                    var qrModal = document.getElementById("qrModal");
+                    var qrCodeEl = document.getElementById("qrBookingCode");
+                    var qrImgEl = document.getElementById("vietQrImage");
+
+                    if (qrCodeEl) qrCodeEl.textContent = bookingCode;
+
+                    // Cấu hình thông tin tài khoản nhận tiền của sân bạn tại đây:
+                    // Cú pháp VietQR: https://img.vietqr.io/image/[MãNgânHàng]-[SốTàiKhoản]-compact2.png?amount=[Tiền]&addInfo=[NộiDung]
+                    var bankId = "MB"; // Ví dụ ngân hàng MBBank
+                    var accountNo = "0901234567999"; // Số tài khoản nhận tiền của sân
+                    var accountName = "NGUYEN VAN A"; // Tên chủ tài khoản
+
+                    var qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNo + "-compact2.png?amount=" + grandTotal + "&addInfo=" + encodeURIComponent(bookingCode) + "&accountName=" + encodeURIComponent(accountName);
+
+                    if (qrImgEl) qrImgEl.src = qrUrl;
+                    if (qrModal) qrModal.style.display = "flex";
+
+                    // Sự kiện khi khách bấm nút hoàn tất sau khi quét QR
+                    var finishBtn = document.getElementById("finishPaymentBtn");
+                    if (finishBtn) {
+                        finishBtn.onclick = function () {
+                            window.location.reload();
+                        };
+                    }
                 })
                 .catch(function (error) {
                     if (confirmError) {
