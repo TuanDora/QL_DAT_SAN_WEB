@@ -94,9 +94,9 @@ namespace MyCourtBooking.Modules.Bookings
 
             var bookedSlotsSet = new HashSet<string>(bookedTimeStrings);
 
-            var slotList = new List<SlotViewModel>();
+			var slotList = new List<MyCourtBooking.Models.ViewModels.SlotViewModel>();
 
-            for (int index = 0; index < 48; index++)
+			for (int index = 0; index < 48; index++)
             {
                 var start = TimeSpan.FromMinutes(index * 30);
                 var end = start.Add(TimeSpan.FromMinutes(30));
@@ -112,8 +112,8 @@ namespace MyCourtBooking.Modules.Bookings
 
                 decimal hourlyPrice = GetHourlyPrice(index);
 
-                slotList.Add(new SlotViewModel
-                {
+				slotList.Add(new MyCourtBooking.Models.ViewModels.SlotViewModel
+				{
                     CourtId = court.Id,
                     CourtName = court.Name,
                     SlotIndex = index,

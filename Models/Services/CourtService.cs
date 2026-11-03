@@ -180,7 +180,7 @@ namespace MyCourtBooking.Models.Services
         }
 
         // 8. Lấy danh sách khung giờ (Slots) còn trống trong ngày
-        public async Task<List<SlotViewModel>> GetAvailableSlotsAsync(int courtId, DateTime date)
+        public async Task<List<CourtSlotViewModel>> GetAvailableSlotsAsync(int courtId, DateTime date)
         {
             // 1. Lấy danh sách các khung giờ (StartTime kiểu TimeSpan) đã bị đặt trong ngày từ CSDL
             var bookedStartTimes = await _context.BookingDetails
@@ -192,7 +192,7 @@ namespace MyCourtBooking.Models.Services
                 .ToListAsync();
 
             // 2. Sinh 48 slot (30 phút/slot) từ 00:00 đến 23:30 bằng kiểu TimeSpan chuẩn
-            var slots = new List<SlotViewModel>();
+            var slots = new List<CourtSlotViewModel>();
             var currentTime = TimeSpan.Zero;
 
             for (int i = 0; i < 48; i++)
@@ -212,7 +212,7 @@ namespace MyCourtBooking.Models.Services
 
                 bool isBooked = bookedStartTimes.Contains(currentTime);
 
-                slots.Add(new SlotViewModel
+                slots.Add(new CourtSlotViewModel
                 {
                     Id = i + 1,
                     CourtId = courtId,

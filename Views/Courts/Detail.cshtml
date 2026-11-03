@@ -1,8 +1,8 @@
-﻿@model MyCourtBooking.Modules.Courts.CourtDetailViewModel
+﻿@model  MyCourtBooking.Models.ViewModels.CourtDetailViewModel
 
 @{
     ViewData["Title"] = Model.Name;
-    var relatedCourts = ViewBag.RelatedCourts as List<MyCourtBooking.Modules.Courts.CourtViewModel> ?? new List<MyCourtBooking.Modules.Courts.CourtViewModel>();
+    var relatedCourts = ViewBag.RelatedCourts as List< MyCourtBooking.Models.ViewModels.CourtViewModel> ?? new List< MyCourtBooking.Models.ViewModels.CourtViewModel>();
 }
 
 <div class="container py-4">

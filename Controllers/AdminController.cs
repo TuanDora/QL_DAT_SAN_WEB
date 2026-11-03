@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MyCourtBooking.Models.Data;
 using MyCourtBooking.Models.Entities;
 using MyCourtBooking.Models.Enums;
+using MyCourtBooking.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -482,23 +483,5 @@ namespace MyCourtBooking.Controllers
 
             return RedirectToAction(nameof(ManageServices));
         }
-    }
-
-    public class CourtTypePricingViewModel
-    {
-        public int TypeId { get; set; }
-        public string Type { get; set; } = string.Empty;
-        public int CourtCount { get; set; }
-        public decimal PricePerHour { get; set; }
-        public decimal PeakPricePerHour { get; set; }
-    }
-    public class CourtReportViewModel
-    {
-        public string CourtName { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
-        public decimal PricePerHour { get; set; }
-        public int TotalBookings { get; set; }
-        public int OccupancyRate { get; set; }
-        public decimal Revenue { get; set; }
     }
 }

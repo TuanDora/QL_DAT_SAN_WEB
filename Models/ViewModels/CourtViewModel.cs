@@ -44,7 +44,7 @@ namespace MyCourtBooking.Models.ViewModels
         public string Name { get; set; } = string.Empty;
     }
 
-    public class SlotViewModel
+    public class CourtSlotViewModel
     {
         public int Id { get; set; }
         public int CourtId { get; set; }

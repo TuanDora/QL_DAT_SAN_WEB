@@ -1,4 +1,4 @@
-﻿@model List<MyCourtBooking.Modules.Courts.CourtViewModel>
+﻿@model List< MyCourtBooking.Models.ViewModels.CourtViewModel>
 
 @{
     // 1. Áp dụng Layout chung để nạp Bootstrap CSS & Header/Footer
@@ -6,7 +6,7 @@
     ViewData["Title"] = "Danh Sách Sân Thể Thao";
 
     var districts = ViewBag.Districts as List<string> ?? new List<string>();
-    var courtTypes = ViewBag.CourtTypes as List<MyCourtBooking.Modules.Courts.CourtTypeViewModel> ?? new List<MyCourtBooking.Modules.Courts.CourtTypeViewModel>();
+    var courtTypes = ViewBag.CourtTypes as List< MyCourtBooking.Models.ViewModels.CourtTypeViewModel> ?? new List< MyCourtBooking.Models.ViewModels.CourtTypeViewModel>();
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
     int totalCount = ViewBag.TotalCount ?? (Model != null ? Model.Count : 0);

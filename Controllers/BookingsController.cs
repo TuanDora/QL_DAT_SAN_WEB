@@ -54,12 +54,12 @@ namespace MyCourtBooking.Controllers
                 .Select(b => new { b.StartTime, b.EndTime }) // Trích xuất StartTime và EndTime từ Database
                 .ToListAsync();
 
-            // ==========================================================
-            // 2. TỰ ĐỘNG TẠO SƠ ĐỒ 48 SLOT ẢO (Xóa bỏ lỗi _context.TimeSlots)
-            // ==========================================================
-            var allSlots = new List<Models.DTOs.SlotViewModel>();
+			// ==========================================================
+			// 2. TỰ ĐỘNG TẠO SƠ ĐỒ 48 SLOT ẢO (Xóa bỏ lỗi _context.TimeSlots)
+			// ==========================================================
+			var allSlots = new List<SlotViewModel>();
 
-            TimeSpan openTime = new TimeSpan(5, 30, 0);  // Sân mở cửa 05:30
+			TimeSpan openTime = new TimeSpan(5, 30, 0);  // Sân mở cửa 05:30
             TimeSpan closeTime = new TimeSpan(23, 0, 0); // Sân đóng cửa 23:00
             TimeSpan currentStartTime = openTime;
 
@@ -85,8 +85,8 @@ namespace MyCourtBooking.Controllers
                 else if (currentStartTime.Hours >= 22) price = 90000; // 22:00 - 24:00
 
                 // Thêm Slot vào danh sách hiển thị cho View
-                allSlots.Add(new Modules.Bookings.SlotViewModel
-                {
+                allSlots.Add(new SlotViewModel
+				{
                     CourtId = court.Id,
                     CourtName = court.Name,
                     SlotIndex = currentSlotIndex,

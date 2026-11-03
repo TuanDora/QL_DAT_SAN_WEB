@@ -1,7 +1,6 @@
-﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model IEnumerable<MyCourtBooking.Modules.Admin.CourtReportViewModel>
+﻿@model IEnumerable<MyCourtBooking.Models.ViewModels.CourtReportViewModel>
 @{
-    Layout = "/Modules/Shared/_AdminLayout.cshtml";
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Báo Báo & Thống Kê Sân Cầu Lông";
 
     decimal totalRevenue = ViewBag.TotalRevenue != null ? Convert.ToDecimal(ViewBag.TotalRevenue) : 0m;

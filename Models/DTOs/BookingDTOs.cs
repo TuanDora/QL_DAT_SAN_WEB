@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MyCourtBooking.Models.ViewModels;
 
 namespace MyCourtBooking.Models.DTOs
 {
@@ -14,20 +15,6 @@ namespace MyCourtBooking.Models.DTOs
         public List<SlotViewModel> Slots { get; set; } = new List<SlotViewModel>();
     }
 
-    public class SlotViewModel
-    {
-        public int CourtId { get; set; }
-        public string CourtName { get; set; } = string.Empty;
-        public int SlotIndex { get; set; }
-        public string StartTime { get; set; } = string.Empty;
-        public string EndTime { get; set; } = string.Empty;
-        public string Status { get; set; } = "empty"; // "empty", "booked", "locked"
-        public decimal PricePerHour { get; set; }
-        public decimal PricePerSlot { get; set; }
-        public string PriceLabel { get; set; } = string.Empty;
-    }
-
-    
 
     public class BookingResult
     {
