@@ -1,7 +1,7 @@
-﻿using MyCourtBooking.Core.Entities;
+﻿using MyCourtBooking.Models.Entities;
 using System.Threading.Tasks;
 
-namespace MyCourtBooking.Services
+namespace MyCourtBooking.Models.Services
 {
     public interface IAuthService
     {

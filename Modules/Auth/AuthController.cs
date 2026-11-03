@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using MyCourtBooking.Core.Data;
 using MyCourtBooking.Core.Entities;
-using MyCourtBooking.Services;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MyCourtBooking.Models.Services;
 
 namespace MyCourtBooking.Modules.Auth
 {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyCourtBooking.Core.Entities;
-using MyCourtBooking.Core.Enums;
-using MyCourtBooking.Core.Data;
+using MyCourtBooking.Models.Entities;
+using MyCourtBooking.Models.Enums;
+using MyCourtBooking.Models.Data;
 using MyCourtBooking.Models.ViewModels;
 
-namespace MyCourtBooking.Modules.Courts
+namespace MyCourtBooking.Models.Services
 {
     public class CourtService : ICourtService
     {

@@ -2,12 +2,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
-using MyCourtBooking.Core.Data;
-using MyCourtBooking.Core.Entities;
+using MyCourtBooking.Models.Data;
+using MyCourtBooking.Models.Entities;
+using MyCourtBooking.Models.Services;
 using MyCourtBooking.Modules.Bookings;
-using MyCourtBooking.Modules.Courts;
 using MyCourtBooking.Modules.Shared;
-using MyCourtBooking.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

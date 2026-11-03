@@ -1,5 +1,4 @@
-﻿using MyCourtBooking.Core.Entities;
-using MyCourtBooking.Models;
+﻿using MyCourtBooking.Models.Entities;
 using MyCourtBooking.Models.DTOs;
 using MyCourtBooking.Models.ViewModels;
 using System;

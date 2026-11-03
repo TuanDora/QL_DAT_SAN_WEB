@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MyCourtBooking.Modules.Courts
+namespace MyCourtBooking.Models.Services
 {
     public interface ICourtService
     {

@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyCourtBooking.Core.Data;
-using MyCourtBooking.Core.Entities;
-using System;
-using System.Threading.Tasks;
+using MyCourtBooking.Models.Data;
+using MyCourtBooking.Models.Entities;
 
-namespace MyCourtBooking.Services
+
+namespace MyCourtBooking.Models.Services
 {
     public class AuthService : IAuthService
     {
