@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyCourtBooking.Models.Entities;
 using MyCourtBooking.Models.Enums;
-using MyCourtBooking.Models.Entities;
 
 namespace MyCourtBooking.Models.Data
 {
