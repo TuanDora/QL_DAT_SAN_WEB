@@ -15,7 +15,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace MyCourtBooking.Modules.Account
+namespace MyCourtBooking.Controllers
 {
     [Authorize]
     public class AccountController : Controller

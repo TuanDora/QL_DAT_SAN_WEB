@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyCourtBooking.Models.Services;
 
-namespace MyCourtBooking.Modules.Courts
+namespace MyCourtBooking.Controllers
 {
     [AllowAnonymous]
     public class CourtsController : Controller

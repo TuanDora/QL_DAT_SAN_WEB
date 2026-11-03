@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyCourtBooking.Modules.Admin
+namespace MyCourtBooking.Controllers
 {
     //[Authorize(Roles = "Admin")]
     public class AdminController : Controller

@@ -6,13 +6,14 @@ using MyCourtBooking.Models.Data;
 using MyCourtBooking.Models.Enums;
 using MyCourtBooking.Models;
 using MyCourtBooking.Models.ViewModels;
-using MyCourtBooking.Models.Services; 
+using MyCourtBooking.Models.Services;
 using System;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using MyCourtBooking.Modules.Bookings;
 
-namespace MyCourtBooking.Modules.Bookings
+namespace MyCourtBooking.Controllers
 {
     [AllowAnonymous]
     public class BookingsController : Controller
@@ -84,7 +85,7 @@ namespace MyCourtBooking.Modules.Bookings
                 else if (currentStartTime.Hours >= 22) price = 90000; // 22:00 - 24:00
 
                 // Thêm Slot vào danh sách hiển thị cho View
-                allSlots.Add(new MyCourtBooking.Modules.Bookings.SlotViewModel
+                allSlots.Add(new Modules.Bookings.SlotViewModel
                 {
                     CourtId = court.Id,
                     CourtName = court.Name,

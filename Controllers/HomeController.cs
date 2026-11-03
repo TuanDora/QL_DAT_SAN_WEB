@@ -4,7 +4,7 @@ using MyCourtBooking.Models.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyCourtBooking.Modules.Home
+namespace MyCourtBooking.Controllers
 {
     public class HomeController : Controller
     {

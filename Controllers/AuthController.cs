@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MyCourtBooking.Models.Services;
 
-namespace MyCourtBooking.Modules.Auth
+namespace MyCourtBooking.Controllers
 {
     public class AuthController : Controller
     {
