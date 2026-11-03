@@ -82,7 +82,8 @@
             if (!serviceId) continue;
 
             var unitPrice = parseFloat(priceAttr) || 0;
-            var quantity = Math.max(1, Math.min(99, parseInt(quantityInput.value, 10) || 1));
+            var maxStock = parseInt(quantityInput.getAttribute("max"), 10) || 99;
+            var quantity = Math.max(1, Math.min(maxStock, parseInt(quantityInput.value, 10) || 1));
 
             services.push({
                 id: serviceId,
@@ -314,8 +315,14 @@
 
             if (!quantityInput || !checkbox) return;
 
+            var maxStock = parseInt(quantityInput.getAttribute("max"), 10) || 99;
+
             function normalizeQuantity() {
-                var quantity = Math.max(1, Math.min(99, parseInt(quantityInput.value, 10) || 1));
+                var currentVal = parseInt(quantityInput.value, 10) || 1;
+                if (currentVal > maxStock) {
+                    alert("Số lượng trong kho chỉ còn tối đa " + maxStock + "!");
+                }
+                var quantity = Math.max(1, Math.min(maxStock, currentVal));
                 quantityInput.value = String(quantity);
                 updateFinalTotal();
             }
@@ -330,7 +337,12 @@
 
             if (plusButton) {
                 plusButton.addEventListener("click", function () {
-                    quantityInput.value = String(Math.min(99, (parseInt(quantityInput.value, 10) || 1) + 1));
+                    var currentVal = parseInt(quantityInput.value, 10) || 1;
+                    if (currentVal >= maxStock) {
+                        alert("Số lượng trong kho chỉ còn tối đa " + maxStock + "!");
+                        return;
+                    }
+                    quantityInput.value = String(Math.min(maxStock, currentVal + 1));
                     checkbox.checked = true;
                     updateFinalTotal();
                 });

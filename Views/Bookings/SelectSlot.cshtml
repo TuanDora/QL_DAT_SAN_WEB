@@ -797,11 +797,13 @@
                         <input type="checkbox" class="service-check" aria-label="Chọn @svc.Name" />
                         <div>
                             <div class="service-name">@svc.Name</div>
-                            <div class="service-price">@svc.Price.ToString("N0")đ / @svc.Unit</div>
+                            <!-- Bổ sung hiển thị số lượng tồn kho để khách hàng thấy rõ -->
+                            <div class="service-price">@svc.Price.ToString("N0")đ / @svc.Unit (Kho: <span class="max-stock">@svc.Stock</span>)</div>
                         </div>
                         <div class="quantity-control">
                             <button type="button" class="quantity-minus" aria-label="Giảm số lượng">−</button>
-                            <input type="number" class="service-quantity" value="1" min="1" max="@svc.Stock" aria-label="Số lượng" />
+                            <!-- Thêm thuộc tính data-stock và giữ nguyên max="@svc.Stock" -->
+                            <input type="number" class="service-quantity" value="1" min="1" max="@svc.Stock" data-stock="@svc.Stock" aria-label="Số lượng" />
                             <button type="button" class="quantity-plus" aria-label="Tăng số lượng">+</button>
                         </div>
                     </div>
