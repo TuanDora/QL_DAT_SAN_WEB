@@ -244,7 +244,7 @@ namespace MyCourtBooking.Models.Services
                 BookingDate = DateTime.Now,
                 TotalAmount = totalPrice,
                 FinalAmount = totalPrice,
-                Status = BookingStatus.Confirmed,
+                Status = BookingStatus.Pending,
                 Note = request.Note ?? "Đặt sân trực tuyến qua Website",
                 CreatedAt = DateTime.Now
             };
