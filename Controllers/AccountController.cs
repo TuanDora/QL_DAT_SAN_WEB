@@ -61,7 +61,7 @@ namespace MyCourtBooking.Controllers
                 CreatedAt = user.CreatedAt ?? DateTime.Now
             };
 
-            return View("~/Modules/Account/Profile.cshtml", model);
+            return View("~/Views/Account/Profile.cshtml", model);
         }
 
         // ==========================================
@@ -92,7 +92,7 @@ namespace MyCourtBooking.Controllers
             if (!ModelState.IsValid)
             {
                 model.Avatar = !string.IsNullOrEmpty(user.Avatar) ? user.Avatar : "/images/default-avatar.png";
-                return View("~/Modules/Account/Profile.cshtml", model);
+                return View("~/Views/Account/Profile.cshtml", model);
             }
 
             // Xử lý upload ảnh đại diện mới nếu có chọn tệp
@@ -134,7 +134,7 @@ namespace MyCourtBooking.Controllers
         [HttpGet]
         public IActionResult ChangePassword()
         {
-            return View("~/Modules/Account/ChangePassword.cshtml", new ChangePasswordViewModel());
+            return View("~/Views/Account/ChangePassword.cshtml", new ChangePasswordViewModel());
         }
 
         [HttpPost]
@@ -143,7 +143,7 @@ namespace MyCourtBooking.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("~/Modules/Account/ChangePassword.cshtml", model);
+                return View("~/Views/Account/ChangePassword.cshtml", model);
             }
 
             int userId = GetCurrentUserId();
@@ -159,7 +159,7 @@ namespace MyCourtBooking.Controllers
             if (verifyResult == PasswordVerificationResult.Failed)
             {
                 ModelState.AddModelError("CurrentPassword", "Mật khẩu hiện tại không chính xác!");
-                return View("~/Modules/Account/ChangePassword.cshtml", model);
+                return View("~/Views/Account/ChangePassword.cshtml", model);
             }
 
             user.PasswordHash = hasher.HashPassword(user, model.NewPassword);
@@ -223,7 +223,7 @@ namespace MyCourtBooking.Controllers
                 historyList.Add(historyItem);
             }
 
-            return View("~/Modules/Account/BookingHistory.cshtml", historyList);
+            return View("~/Views/Account/BookingHistory.cshtml", historyList);
         }
 
         [HttpPost]

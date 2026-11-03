@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using MyCourtBooking.Models.Data;
@@ -19,6 +18,18 @@ builder.Services.AddScoped<ICourtService, CourtService>();
 // Bổ sung các Service khác nếu dự án của bạn có (mở comment nếu sử dụng):
 builder.Services.AddScoped<IBookingService, BookingService>();
 // builder.Services.AddScoped<IPaymentService, PaymentService>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.LogoutPath = "/Auth/Logout";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
+}); 
 
 // 5. Đăng ký HttpContextAccessor, Session & Controllers với Views
 builder.Services.AddHttpContextAccessor();

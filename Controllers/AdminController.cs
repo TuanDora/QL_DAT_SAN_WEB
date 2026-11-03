@@ -73,7 +73,7 @@ namespace MyCourtBooking.Controllers
                                  .Sum(b => b.FinalAmount > 0 ? b.FinalAmount : b.TotalAmount)
             ).ToList();
 
-            return View("~/Modules/Admin/Index.cshtml");
+            return View("~/Views/Admin/Index.cshtml");
         }
 
         // ==========================================
@@ -108,7 +108,7 @@ namespace MyCourtBooking.Controllers
                       .ToList();
 
             var courts = await courtsQuery.OrderByDescending(c => c.Id).ToListAsync();
-            return View("~/Modules/Admin/ManageCourts.cshtml", courts);
+            return View("~/Views/Admin/ManageCourts.cshtml", courts);
         }
 
         [HttpPost]
@@ -193,7 +193,7 @@ namespace MyCourtBooking.Controllers
             ViewData["StatusFilter"] = statusFilter;
 
             var bookings = await query.OrderByDescending(b => b.Id).ToListAsync();
-            return View("~/Modules/Admin/ManageBookings.cshtml", bookings);
+            return View("~/Views/Admin/ManageBookings.cshtml", bookings);
         }
 
         [HttpPost]
@@ -227,7 +227,7 @@ namespace MyCourtBooking.Controllers
             }
 
             var users = await query.OrderByDescending(u => u.Id).ToListAsync();
-            return View("~/Modules/Admin/ManageUsers.cshtml", users);
+            return View("~/Views/Admin/ManageUsers.cshtml", users);
         }
 
         [HttpPost]
@@ -312,7 +312,7 @@ namespace MyCourtBooking.Controllers
                     PeakPricePerHour = (courts.FirstOrDefault(c => c.CourtType == type)?.PricePerHour ?? 100000m) * 1.3m
                 }).ToList();
 
-            return View("~/Modules/Admin/Pricing.cshtml", pricingList);
+            return View("~/Views/Admin/Pricing.cshtml", pricingList);
         }
 
         [HttpPost]
@@ -355,7 +355,7 @@ namespace MyCourtBooking.Controllers
             ViewBag.AccountHolder = TempData["AccountHolder"]?.ToString() ?? "NGUYEN VAN A";
             ViewBag.MaintenanceMode = TempData["MaintenanceMode"] != null && Convert.ToBoolean(TempData["MaintenanceMode"]);
 
-            return View("~/Modules/Admin/Settings.cshtml");
+            return View("~/Views/Admin/Settings.cshtml");
         }
 
         [HttpPost]
@@ -397,7 +397,7 @@ namespace MyCourtBooking.Controllers
             decimal totalRevenue = confirmedBookings.Sum(b => b.FinalAmount > 0 ? b.FinalAmount : b.TotalAmount);
             ViewBag.TotalRevenue = totalRevenue;
 
-            return View("~/Modules/Admin/Reports.cshtml");
+            return View("~/Views/Admin/Reports.cshtml");
         }
 
         // ==========================================
@@ -406,7 +406,7 @@ namespace MyCourtBooking.Controllers
         [HttpGet]
         public IActionResult AuditLogs()
         {
-            return View("~/Modules/Admin/AuditLogs.cshtml");
+            return View("~/Views/Admin/AuditLogs.cshtml");
         }
         // ==========================================
         // 9. QUẢN LÝ DỊCH VỤ & KHO HÀNG (/Admin/ManageServices)
@@ -420,7 +420,7 @@ namespace MyCourtBooking.Controllers
                 .OrderByDescending(s => s.Id)
                 .ToListAsync();
 
-            return View("~/Modules/Admin/ManageServices.cshtml", services);
+            return View("~/Views/Admin/ManageServices.cshtml", services);
         }
 
         // 2. LƯU DỊCH VỤ MỚI VÀO DATABASE SQL SERVER

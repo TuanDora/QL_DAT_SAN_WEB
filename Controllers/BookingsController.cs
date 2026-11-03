@@ -231,7 +231,7 @@ namespace MyCourtBooking.Controllers
                 }).ToList() ?? new List<MyBookingDetailItem>()
             }).ToList();
 
-            return View("~/Modules/Bookings/MyBookings.cshtml", viewModels);
+            return View("~/Views/Bookings/MyBookings.cshtml", viewModels);
         }
     }
 }

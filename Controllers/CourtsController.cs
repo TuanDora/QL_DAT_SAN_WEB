@@ -44,7 +44,7 @@ namespace MyCourtBooking.Controllers
             ViewBag.Districts = await _courtService.GetDistrictsAsync();
             ViewBag.CourtTypes = await _courtService.GetCourtTypesAsync();
 
-            return View("~/Modules/Courts/Index.cshtml", courts);
+            return View("~/Views/Courts/Index.cshtml", courts);
         }
         
         // GET: /Courts/Detail/5
@@ -58,7 +58,7 @@ namespace MyCourtBooking.Controllers
             }
 
             ViewBag.RelatedCourts = await _courtService.GetRelatedCourtsAsync(id, courtDetail.District, 3);
-            return View("~/Modules/Courts/Detail.cshtml", courtDetail);
+            return View("~/Views/Courts/Detail.cshtml", courtDetail);
         }
 
         // GET: /Courts/GetAvailableSlotsAjax
