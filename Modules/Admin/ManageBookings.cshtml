@@ -142,7 +142,8 @@
                                     }
                                     else if (item.Status == BookingStatus.Confirmed)
                                     {
-                                        <form asp-controller="Admin" asp-action="UpdateBookingStatus" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ lịch đơn đã xác nhận này? Slot sẽ mở lại cho khách khác.');">
+                                        <!-- Form Hủy / Gỡ lịch cho Admin -->
+                                        <form action="/Admin/UpdateBookingStatus" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ lịch / hủy đơn đặt sân này?');">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="bookingId" value="@item.Id" />
                                             <input type="hidden" name="status" value="Cancelled" />
