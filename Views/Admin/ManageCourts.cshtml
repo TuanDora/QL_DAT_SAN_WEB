@@ -147,7 +147,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Loại sân <span class="text-danger">*</span></label>
                             <select name="CourtTypeId" class="form-select" required>
-                                @foreach (var type in courtTypes)
+                                @foreach (var type in Enum.GetValues(typeof(MyCourtBooking.Models.Enums.CourtType)))
                                 {
                                     <option value="@((int)type)">@type.ToString()</option>
                                 }
@@ -207,7 +207,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Loại sân <span class="text-danger">*</span></label>
                             <select id="editCourtTypeId" name="CourtTypeId" class="form-select" required>
-                                @foreach (var type in courtTypes)
+                                @foreach (var type in Enum.GetValues(typeof(MyCourtBooking.Models.Enums.CourtType)))
                                 {
                                     <option value="@((int)type)">@type.ToString()</option>
                                 }
@@ -248,27 +248,31 @@
 </div>
 
 <script>
-    // 1. Sửa lỗi TS2683: Thay 'this' bằng 'e.currentTarget' hoặc tham số phần tử truyền vào
-    document.querySelectorAll('.btn-edit-court').forEach(function (button) {
-        button.addEventListener('click', function (e) {
-            var btn = e.currentTarget;
-            if (!btn || !(btn instanceof HTMLElement)) return;
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Lắng nghe sự kiện click vào tất cả các nút sửa sân
+        document.querySelectorAll('.edit-court-btn').forEach(function (button) {
+            button.addEventListener('click', function (e) {
+                var btn = e.currentTarget;
+                if (!btn || !(btn instanceof HTMLElement)) return;
 
-            var id = btn.getAttribute('data-id') || '';
-            var name = btn.getAttribute('data-name') || '';
-            var typeId = btn.getAttribute('data-type-id') || '';
-            var price = btn.getAttribute('data-price') || '';
-            var address = btn.getAttribute('data-address') || '';
-            var district = btn.getAttribute('data-district') || '';
-            var desc = btn.getAttribute('data-description') || '';
+                // Lấy dữ liệu cũ từ các thuộc tính data-* trên nút bấm
+                var id = btn.getAttribute('data-id') || '';
+                var name = btn.getAttribute('data-name') || '';
+                var typeId = btn.getAttribute('data-courttypeid') || '';
+                var district = btn.getAttribute('data-district') || '';
+                var address = btn.getAttribute('data-address') || '';
+                var price = btn.getAttribute('data-baseprice') || '';
+                var desc = btn.getAttribute('data-description') || '';
+                var isActive = btn.getAttribute('data-isactive') || 'true';
 
-            openEditCourtModal(id, name, typeId, price, address, district, desc);
+                // Gọi hàm đổ dữ liệu lên Modal và mở Modal lên
+                openEditCourtModal(id, name, typeId, district, address, price, desc, isActive);
+            });
         });
     });
 
-    // 2. Sửa lỗi TS2531 & TS2339 & TS2304
-    function openEditCourtModal(id, name, typeId, price, address, district, desc) {
-        // Hàm hỗ trợ gán giá trị an toàn cho HTMLElement
+    // 2. Hàm gán dữ liệu vào Modal và hiển thị
+    function openEditCourtModal(id, name, typeId, district, address, price, desc, isActive) {
         function setInputValue(elementId, val) {
             var el = document.getElementById(elementId);
             if (el) {
@@ -278,16 +282,17 @@
 
         setInputValue('editCourtId', id);
         setInputValue('editCourtName', name);
-        setInputValue('editTypeId', typeId);
-        setInputValue('editBasePrice', price);
-        setInputValue('editAddress', address);
-        setInputValue('editDistrict', district);
-        setInputValue('editDescription', desc);
+        setInputValue('editCourtTypeId', typeId);
+        setInputValue('editCourtDistrict', district);
+        setInputValue('editCourtAddress', address);
+        setInputValue('editCourtBasePrice', price);
+        setInputValue('editCourtDescription', desc);
+        setInputValue('editCourtIsActive', isActive);
 
-        // Mở Modal Bootstrap an toàn qua window['bootstrap']
+        // Kích hoạt bật bảng Modal lên bằng Bootstrap 5
         var modalEl = document.getElementById('editCourtModal');
         if (modalEl && window['bootstrap']) {
-            var modal = new (window['bootstrap']).Modal(modalEl);
+            var modal = new window['bootstrap'].Modal(modalEl);
             modal.show();
         }
     }
