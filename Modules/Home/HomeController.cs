@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyCourtBooking.Core.Data;
+using MyCourtBooking.Models.Data;
 using System.Linq;
 using System.Threading.Tasks;
 

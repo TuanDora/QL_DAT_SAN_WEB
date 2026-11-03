@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyCourtBooking.Core.Data;
-using MyCourtBooking.Core.Entities;
-using MyCourtBooking.Core.Enums;
-using MyCourtBooking.Data;
+using MyCourtBooking.Models.Data;
+using MyCourtBooking.Models.Entities;
+using MyCourtBooking.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

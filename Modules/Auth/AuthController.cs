@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
-using MyCourtBooking.Core.Data;
-using MyCourtBooking.Core.Entities;
+using MyCourtBooking.Models.Data;
+using MyCourtBooking.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
