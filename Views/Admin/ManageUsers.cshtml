@@ -1,7 +1,7 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model IEnumerable<MyCourtBooking.Models.Entities.User>
 @{
-    Layout = "/Modules/Shared/_AdminLayout.cshtml";
+    Layout = "/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Quản lý Tài khoản & Phân quyền";
 
     var staffList = Model?.Where(u => u.Role == "Admin" || u.Role == "Staff").ToList() ?? new List<MyCourtBooking.Models.Entities.User>();

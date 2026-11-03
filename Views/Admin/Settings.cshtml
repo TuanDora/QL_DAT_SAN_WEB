@@ -1,6 +1,6 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    Layout = "/Modules/Shared/_AdminLayout.cshtml";
+    Layout = "/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Cấu hình Hệ thống";
 
     var systemName = ViewBag.SystemName ?? TempData["SystemName"]?.ToString() ?? "Hệ thống Quản lý Sân Thể Thao";
