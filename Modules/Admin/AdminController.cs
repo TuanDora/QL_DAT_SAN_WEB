@@ -197,17 +197,32 @@ namespace MyCourtBooking.Modules.Admin
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateBookingStatus(int bookingId, BookingStatus status)
+        [IgnoreAntiforgeryToken] // Tránh lỗi AntiForgeryToken làm chặn request
+        public async Task<IActionResult> UpdateBookingStatus(int bookingId, string status)
         {
             var booking = await _context.Bookings.FindAsync(bookingId);
-            if (booking != null)
+            if (booking == null)
             {
-                booking.Status = status;
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Đã cập nhật trạng thái đơn hàng #{booking.BookingCode ?? bookingId.ToString()} thành '{status}'!";
+                TempData["ErrorMessage"] = "Không tìm thấy đơn đặt sân.";
+                return RedirectToAction("ManageBookings");
             }
-            return RedirectToAction(nameof(ManageBookings));
+
+            // Chuyển đổi chuỗi sang Enum BookingStatus (Cancelled, Confirmed,...)
+            if (Enum.TryParse<BookingStatus>(status, true, out var parsedStatus))
+            {
+                booking.Status = parsedStatus;
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = parsedStatus == BookingStatus.Cancelled
+                    ? "Đã gỡ lịch / hủy đơn thành công! Slot sân đã được giải phóng."
+                    : "Cập nhật trạng thái đơn thành công!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Trạng thái đơn không hợp lệ.";
+            }
+
+            return RedirectToAction("ManageBookings");
         }
 
         // ==========================================
@@ -482,6 +497,19 @@ namespace MyCourtBooking.Modules.Admin
             }
 
             return RedirectToAction(nameof(ManageServices));
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CancelBookingByAdmin(int bookingId)
+        {
+            var booking = await _context.Bookings.FindAsync(bookingId);
+            if (booking != null)
+            {
+                booking.Status = BookingStatus.Cancelled; // Hoặc Expired
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Đã gỡ lịch thành công!" });
+            }
+            return Json(new { success = false, message = "Không tìm thấy đơn đặt sân." });
         }
     }
 

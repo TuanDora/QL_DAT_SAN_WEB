@@ -1,5 +1,4 @@
-﻿@model List<MyCourtBooking.Modules.Bookings.SlotViewModel>
-
+﻿@model List<MyCourtBooking.Modules.Bookings.ApiModels.SlotViewModel>
 @{
     ViewData["Title"] = "Đặt sân và Chọn Khung Giờ";
 
@@ -582,7 +581,7 @@
                 Chọn sân và các khung giờ liên tiếp bạn muốn đặt.
             </div>
         </div>
-        <strong>Hệ thống sân tiêu chuẩn · Mở cửa 24/24</strong>
+        <strong>Hệ thống sân tiêu chuẩn · Mở cửa 24/7</strong>
     </div>
 
     <div class="panel date-panel">
@@ -601,10 +600,10 @@
 
     <div class="price-list">
         <strong>Bảng giá:</strong>
-        <span>00:00–06:00: 75.000đ/giờ</span>
+        <span>00:00–6:00: 75.000đ/giờ</span>
         <span>06:00–16:00: 65.000đ/giờ</span>
         <span>16:00–22:00: 140.000đ/giờ</span>
-        <span>22:00–24:00: 90.000đ/giờ</span>
+        <span>22:00–23:30: 90.000đ/giờ</span>
     </div>
 
     <div class="legend">
@@ -622,7 +621,7 @@
             <section class="court-card">
                 <div class="court-heading">
                     <h5>@court.First().CourtName</h5>
-                    <span class="muted">Giờ hoạt động: 05:30 - 23:00</span>
+                    <span class="muted">Giờ hoạt động: 00:00 - 24:00</span>
                 </div>
 
                 <div class="slot-grid">
@@ -633,12 +632,12 @@
                         bool isValidTime = TimeSpan.TryParse(slot.StartTime.ToString(), out slotStart);
 
                         // 2. LỌC KHUNG GIỜ MỞ CỬA (05:30 đến 23:00)
-                        TimeSpan openTime = new TimeSpan(5, 30, 0);
-                        TimeSpan closeTime = new TimeSpan(23, 0, 0);
+                        TimeSpan openTime = new TimeSpan(0, 0, 0);
+                        TimeSpan closeTime = new TimeSpan(24, 0, 0);
 
                         if (isValidTime && (slotStart < openTime || slotStart >= closeTime))
                         {
-                            // Lệnh continue sẽ bỏ qua hoàn toàn các slot từ 00:00-05:00 và 23:00-24:00
+                            
                             continue;
                         }
 

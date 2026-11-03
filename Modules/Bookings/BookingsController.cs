@@ -10,6 +10,7 @@ using System;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using MyCourtBooking.Modules.Bookings.ApiModels;
 
 namespace MyCourtBooking.Modules.Bookings
 {
@@ -20,8 +21,6 @@ namespace MyCourtBooking.Modules.Bookings
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
 
-        // 2. Khởi tạo Constructor để ASP.NET Core tự động nạp Database vào Controller
-        // 2. Khởi tạo Constructor để ASP.NET Core tự động nạp Database và Service vào Controller
         public BookingsController(ApplicationDbContext context, IBookingService bookingService, IConfiguration configuration)
         {
             _context = context;
@@ -31,10 +30,7 @@ namespace MyCourtBooking.Modules.Bookings
 
 
 
-        // ==========================================
-        // 1. TRANG CHỌN KHUNG GIỜ & ĐẶT SÂN
-        // ==========================================
-        // GET: /Bookings/SelectSlot?courtId=1&date=2026-10-25&slotId=5
+        
         [HttpGet]
         public async Task<IActionResult> SelectSlot(int courtId, DateTime? date)
         {
@@ -43,22 +39,21 @@ namespace MyCourtBooking.Modules.Bookings
             var court = await _context.Courts.FindAsync(courtId);
             if (court == null) return NotFound();
 
-            // ==========================================================
-            // 1. TÌM CÁC KHUNG GIỜ ĐÃ ĐƯỢC ĐẶT (Đã sửa lỗi SlotId)
-            // Lấy danh sách giờ bắt đầu & kết thúc của các đơn đặt sân
-            // ==========================================================
-            var bookedTimes = await _context.Bookings
-                .Where(b => b.CourtId == courtId && b.BookingDate.Date == selectedDate.Date && b.Status != BookingStatus.Cancelled)
-                .Select(b => new { b.StartTime, b.EndTime }) // Trích xuất StartTime và EndTime từ Database
-                .ToListAsync();
 
-            // ==========================================================
-            // 2. TỰ ĐỘNG TẠO SƠ ĐỒ 48 SLOT ẢO (Xóa bỏ lỗi _context.TimeSlots)
-            // ==========================================================
-            var allSlots = new List<MyCourtBooking.Modules.Bookings.SlotViewModel>();
+            var bookedTimes = await _context.BookingDetails
+    .Include(bd => bd.Booking)
+    .Where(bd => bd.CourtId == courtId
+              && bd.PlayDate.Date == selectedDate.Date
+              && bd.Booking.Status != BookingStatus.Cancelled
+              && bd.Booking.Status != BookingStatus.Expired)
+    .Select(bd => new { bd.StartTime, bd.EndTime })
+    .ToListAsync();
 
-            TimeSpan openTime = new TimeSpan(5, 30, 0);  // Sân mở cửa 05:30
-            TimeSpan closeTime = new TimeSpan(23, 0, 0); // Sân đóng cửa 23:00
+
+            var allSlots = new List<MyCourtBooking.Modules.Bookings.ApiModels.SlotViewModel>();
+
+            TimeSpan openTime = new TimeSpan(0, 0, 0);  
+            TimeSpan closeTime = new TimeSpan(24, 0, 0); 
             TimeSpan currentStartTime = openTime;
 
             while (currentStartTime < closeTime)
@@ -66,8 +61,6 @@ namespace MyCourtBooking.Modules.Bookings
                 TimeSpan currentEndTime = currentStartTime.Add(TimeSpan.FromMinutes(30));
                 int currentSlotIndex = (int)currentStartTime.TotalMinutes / 30 + 1;
 
-                // KIỂM TRA TRẠNG THÁI KHUNG GIỜ (Trống / Đã đặt / Đã qua)
-                // Khung giờ bị trùng nếu nó nằm bên trong bất kỳ thời gian Booking nào đã lấy ở Bước 1
                 bool isBooked = bookedTimes.Any(b => currentStartTime >= b.StartTime && currentStartTime < b.EndTime);
                 bool isPast = (selectedDate.Date == DateTime.Today) && (currentStartTime <= DateTime.Now.TimeOfDay);
 
@@ -75,29 +68,46 @@ namespace MyCourtBooking.Modules.Bookings
                 if (isBooked) status = "booked";
                 else if (isPast) status = "locked";
 
-                // TÍNH GIÁ TIỀN CHUẨN XÁC THEO KHUNG GIỜ
-                decimal price = 65000;
-                if (currentStartTime.Hours < 6) price = 75000; // 00:00 - 06:00
-                else if (currentStartTime.Hours >= 6 && currentStartTime.Hours < 16) price = 65000; // 06:00 - 16:00
-                else if (currentStartTime.Hours >= 16 && currentStartTime.Hours < 22) price = 140000; // 16:00 - 22:00
-                else if (currentStartTime.Hours >= 22) price = 90000; // 22:00 - 24:00
+                decimal hourlyPrice = 65000;
 
-                // Thêm Slot vào danh sách hiển thị cho View
-                allSlots.Add(new MyCourtBooking.Modules.Bookings.SlotViewModel
+                if (currentStartTime.Hours < 6)
                 {
-                    CourtId = court.Id,
+                    hourlyPrice = 75000;  // 00:00 - 06:00
+                }
+                else if (currentStartTime.Hours >= 6 && currentStartTime.Hours < 16)
+                {
+                    hourlyPrice = 65000;  // 06:00 - 16:00
+                }
+                else if (currentStartTime.Hours >= 16 && currentStartTime.Hours < 22)
+                {
+                    hourlyPrice = 140000; // 16:00 - 22:00
+                }
+                else
+                {
+                    hourlyPrice = 90000;  // 22:00 - 24:00
+                }
+
+                // GIÁ TIỀN THỰC TẾ CHO SLOT 30 PHÚT (0.5 GIỜ)
+                decimal slotPrice = hourlyPrice / 2;
+
+                // Khởi tạo SlotViewModel và thêm vào danh sách
+                allSlots.Add(new MyCourtBooking.Modules.Bookings.ApiModels.SlotViewModel
+                {
+                    CourtId = court.Id,                               
                     CourtName = court.Name,
                     SlotIndex = currentSlotIndex,
-                    StartTime = currentStartTime.ToString(@"hh\:mm"),
-                    EndTime = currentEndTime.ToString(@"hh\:mm"),
+                    StartTime = currentStartTime.ToString(@"hh\:mm"), // Vì StartTime trong model là string
+                    EndTime = currentEndTime.ToString(@"hh\:mm"),     // Vì EndTime trong model là string
                     Status = status,
-                    PricePerSlot = price
+                    PricePerHour = hourlyPrice,                       // Giá 1 giờ (VD: 90,000)
+                    PricePerSlot = slotPrice,                         // Giá 1 slot 30p (VD: 45,000)
+                    Price = slotPrice                                 // Gán giá slot 30p
                 });
 
-                // Tăng lên 30 phút để kiểm tra khung giờ tiếp theo
                 currentStartTime = currentEndTime;
             }
-
+            ViewBag.CourtId = court.Id;
+            ViewBag.CourtName = court.Name;
             ViewBag.SelectedDate = selectedDate.ToString("yyyy-MM-dd");
             ViewBag.CourtPhone = "0912345678";
             ViewBag.CourtZalo = "0912345678";

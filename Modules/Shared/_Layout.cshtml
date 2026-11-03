@@ -69,8 +69,10 @@
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
 
-                                    <!-- NÚT VÀO TRANG QUẢN TRỊ (HIỆN NGAY LẬP TỨC CHO ADMIN) -->
-                                    @if (User.IsInRole("Admin") || User.Identity?.Name?.Contains("admin") == true)
+                                    <!-- NÚT VÀO TRANG QUẢN TRỊ (HIỆN CHO ADMIN) -->
+                                    @if (User.IsInRole("Admin")
+                                        || User.Claims.Any(c => c.Value.ToLower().Contains("admin"))
+                                        || User.Identity?.Name == "Quản trị viên")
                                     {
                                         <li>
                                             <a class="dropdown-item py-2 text-primary fw-bold bg-light" href="/Admin">

@@ -44,6 +44,7 @@
                 <option value="Pending" selected="@(ViewData["StatusFilter"]?.ToString() == "Pending")">Chờ duyệt</option>
                 <option value="Confirmed" selected="@(ViewData["StatusFilter"]?.ToString() == "Confirmed")">Đã xác nhận</option>
                 <option value="Cancelled" selected="@(ViewData["StatusFilter"]?.ToString() == "Cancelled")">Đã hủy</option>
+                <option value="Expired" selected="@(ViewData["StatusFilter"]?.ToString() == "Expired")">Quá hạn</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -79,7 +80,7 @@
                         var startTime = firstDetail != null ? firstDetail.StartTime.ToString(@"hh\:mm") : "--:--";
                         var endTime = firstDetail != null ? firstDetail.EndTime.ToString(@"hh\:mm") : "--:--";
                         var totalAmount = item.FinalAmount > 0 ? item.FinalAmount : item.TotalAmount;
-                        var customerName = !string.IsNullOrWhiteSpace(item.CustomerName) ? item.CustomerName : (item.User?.FullName ?? "Khách vãng lai");
+                        var customerName = !string.IsNullOrWhiteSpace(item.CustomerName) ? item.CustomerName : (item.User?.FullName ?? "Khách đặt Online");
                         var customerPhone = !string.IsNullOrWhiteSpace(item.CustomerPhone) ? item.CustomerPhone : (item.User?.PhoneNumber ?? "---");
 
                         <tr>
@@ -105,6 +106,14 @@
                                 {
                                     <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill">Đã hủy</span>
                                 }
+                                else if (item.Status == BookingStatus.Expired)
+                                {
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-3 py-2 rounded-pill">Quá hạn</span>
+                                }
+                                else if (item.Status == BookingStatus.Completed)
+                                {
+                                    <span class="badge bg-info bg-opacity-10 text-info border border-info px-3 py-2 rounded-pill">Hoàn thành</span>
+                                }
                                 else
                                 {
                                     <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-3 py-2 rounded-pill">Chờ duyệt</span>
@@ -123,22 +132,21 @@
                                             </button>
                                         </form>
 
-                                        <form asp-controller="Admin" asp-action="UpdateBookingStatus" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đặt sân này?');">
-                                            @Html.AntiForgeryToken()
+                                        <form asp-module="Admin" asp-controller="Admin" asp-action="UpdateBookingStatus" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ lịch / hủy đơn đặt sân này?');">
                                             <input type="hidden" name="bookingId" value="@item.Id" />
                                             <input type="hidden" name="status" value="Cancelled" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Hủy đơn">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Gỡ lịch / Hủy đơn">
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         </form>
                                     }
                                     else if (item.Status == BookingStatus.Confirmed)
                                     {
-                                        <form asp-controller="Admin" asp-action="UpdateBookingStatus" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đã xác nhận này?');">
+                                        <form asp-controller="Admin" asp-action="UpdateBookingStatus" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ lịch đơn đã xác nhận này? Slot sẽ mở lại cho khách khác.');">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="bookingId" value="@item.Id" />
                                             <input type="hidden" name="status" value="Cancelled" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Hủy đơn">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Gỡ lịch / Hủy đơn">
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         </form>

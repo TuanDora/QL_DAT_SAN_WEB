@@ -20,6 +20,8 @@
 
         public string PriceLabel { get; set; } = string.Empty;
 
+        public decimal Price { get; set; }
+
         public string StatusText => Status switch
         {
             "booked" => "Đã đặt",
