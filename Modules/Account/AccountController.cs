@@ -158,7 +158,12 @@ namespace MyCourtBooking.Modules.Account
 
             if (verifyResult == PasswordVerificationResult.Failed)
             {
-                ModelState.AddModelError("CurrentPassword", "Mật khẩu hiện tại không chính xác!");
+                // Đổi key từ "CurrentPassword" thành string.Empty để hiển thị ở asp-validation-summary
+                ModelState.AddModelError(string.Empty, "Mật khẩu hiện tại không chính xác!");
+
+                // (Tùy chọn) Bổ sung thông báo đỏ ngay dưới ô nhập mật khẩu cũ
+                ModelState.AddModelError("CurrentPassword", "Mật khẩu không đúng.");
+
                 return View("~/Modules/Account/ChangePassword.cshtml", model);
             }
 

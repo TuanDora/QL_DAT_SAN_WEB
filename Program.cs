@@ -57,7 +57,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddHostedService<MyCourtBooking.Services.ExpiredBookingBackgroundService>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
 var app = builder.Build();
 
 // 6. Cấu hình Middleware Pipeline

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyCourtBooking.Core.Data;
 using MyCourtBooking.Core.Entities;
 using MyCourtBooking.Services;
@@ -9,23 +11,115 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace MyCourtBooking.Modules.Auth
 {
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
-        private readonly ApplicationDbContext _context; // Đảm bảo đã khai báo biến này
+        private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
 
         // Constructor phải gán giá trị cho cả _authService và _context
-        public AuthController(IAuthService authService, ApplicationDbContext context)
+        public AuthController(IAuthService authService, ApplicationDbContext context, IEmailService emailService)
         {
             _authService = authService;
-            _context = context; // <--- Dòng này rất quan trọng để _context không bị null
+            _context = context;
+            _emailService = emailService;
+        }
+        // 1. XỬ LÝ QUÊN MẬT KHẨU (GỬI MAIL)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(string Email)
+        {
+            if (string.IsNullOrWhiteSpace(Email))
+            {
+                ViewBag.ErrorMessage = "Vui lòng nhập địa chỉ email!";
+                return View("~/Modules/Auth/ForgotPassword.cshtml");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == Email);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = "Email này chưa được đăng ký trong hệ thống!";
+                return View("~/Modules/Auth/ForgotPassword.cshtml");
+            }
+
+            try
+            {
+                string resetToken = Guid.NewGuid().ToString();
+                string resetLink = Url.Action("ResetPassword", "Auth", new { token = resetToken, email = Email }, Request.Scheme)!;
+
+                string body = $@"
+            <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;'>
+                <h3 style='color: #0d6efd;'>Khôi phục mật khẩu - MyCourtBooking</h3>
+                <p>Xin chào <b>{user.FullName ?? user.Email}</b>,</p>
+                <p>Vui lòng bấm vào nút bên dưới để tiến hành tạo mật khẩu mới:</p>
+                <p style='margin: 20px 0;'>
+                    <a href='{resetLink}' style='background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Đặt lại mật khẩu</a>
+                </p>
+            </div>";
+
+                await _emailService.SendEmailAsync(Email, "Khôi phục mật khẩu MyCourtBooking", body);
+
+                // Gán thông báo vào cả ViewBag và TempData
+                string successMsg = "Yêu cầu khôi phục mật khẩu đã được gửi đến email của bạn!";
+                ViewBag.SuccessMessage = successMsg;
+                TempData["SuccessMessage"] = successMsg;
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Không thể gửi email: " + ex.Message;
+            }
+
+            return View("~/Modules/Auth/ForgotPassword.cshtml");
         }
 
-        // ViewModel nhận dữ liệu trực tiếp từ form chuẩn
+        // 2. TRANG ĐẶT LẠI MẬT KHẨU KHI BẤM LINK TỪ EMAIL (GET) -> SỬA LỖI 404
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("Login");
+            }
+
+            var model = new ResetPasswordViewModel
+            {
+                Token = token,
+                Email = email
+            };
+
+            return View("~/Modules/Auth/ResetPassword.cshtml", model);
+        }
+
+        // 3. XỬ LÝ LƯU MẬT KHẨU MỚI (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("~/Modules/Auth/ResetPassword.cshtml", model);
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = "Tài khoản không tồn tại trên hệ thống!";
+                return View("~/Modules/Auth/ResetPassword.cshtml", model);
+            }
+
+            // Hash mật khẩu mới và lưu vào DB
+            var hasher = new PasswordHasher<User>();
+            user.PasswordHash = hasher.HashPassword(user, model.NewPassword);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.";
+            return RedirectToAction("Login", "Auth");
+        }
         public class LoginViewModel
         {
             public string Email { get; set; } = string.Empty;
@@ -96,19 +190,7 @@ namespace MyCourtBooking.Modules.Auth
         [HttpGet]
         public IActionResult ForgotPassword() => View();
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(string email)
-        {
-            var user = await _authService.GetByEmailOrPhoneAsync(email);
-            if (user == null)
-            {
-                ViewBag.Error = "Không tìm thấy tài khoản với email này!";
-                return View();
-            }
-            ViewBag.Success = "Yêu cầu khôi phục mật khẩu đã được gửi đến email của bạn!";
-            return View();
-        }
+        
 
         [HttpGet]
         public IActionResult Register() => View();
