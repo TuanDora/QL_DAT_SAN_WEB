@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MyCourtBooking.Core.Entities;
+using MyCourtBooking.Models.Entities;
 
 namespace MyCourtBooking.Models.Entities
 {

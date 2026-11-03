@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using MyCourtBooking.Core.Entities;
-using MyCourtBooking.Core.Enums;
+using MyCourtBooking.Models.Entities;
+using MyCourtBooking.Models.Enums;
 using MyCourtBooking.Models.Entities;
 
-namespace MyCourtBooking.Core.Data
+namespace MyCourtBooking.Models.Data
 {
     public class ApplicationDbContext : DbContext
     {

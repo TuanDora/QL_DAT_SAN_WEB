@@ -1,4 +1,4 @@
-﻿using MyCourtBooking.Core.Entities;
+﻿using MyCourtBooking.Models.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace MyCourtBooking.Models.Entities

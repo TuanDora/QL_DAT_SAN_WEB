@@ -1,4 +1,4 @@
-﻿namespace MyCourtBooking.Core.Enums
+﻿namespace MyCourtBooking.Models.Enums
 {
     public enum CourtType
     {

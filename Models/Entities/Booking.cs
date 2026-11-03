@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MyCourtBooking.Core.Enums;
+using MyCourtBooking.Models.Enums;
 
 namespace MyCourtBooking.Models.Entities
 {
